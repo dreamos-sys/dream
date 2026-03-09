@@ -4,16 +4,15 @@
       "id": "sekuriti",
       "name": "SEKURITI",
       "icon": "🛡️",
-      "path": "/modules/sekuriti/module.js",
+      "path": "./modules/sekuriti/module.js",
       "permissions": ["all", "sekuriti"]
     },
     {
       "id": "booking",
       "name": "BOOKING",
       "icon": "📅",
-      "path": "/modules/booking/module.js",
+      "path": "./modules/booking/module.js",
       "permissions": ["all", "booking"]
     }
-    // Tambahkan modul lain nanti
   ]
 }
