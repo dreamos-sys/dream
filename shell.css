@@ -1,0 +1,6 @@
+body { background: #0b1120; color: #fff; font-family: sans-serif; margin: 0; }
+.shell-header { padding: 1rem; display: flex; justify-content: space-between; }
+.module-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; padding: 1rem; }
+.module-card { background: #1e293b; padding: 1.5rem; border-radius: 12px; cursor: pointer; }
+.module-container { padding: 1rem; }
+.error { color: #ef4444; padding: 2rem; text-align: center; }
