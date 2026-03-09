@@ -2,13 +2,31 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <base href="./"> <title>Dream OS v2.1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  
+  <!-- PWA Meta -->
+  <meta name="theme-color" content="#10b981">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="./manifest.json">
+  
+  <!-- Security Headers (via meta, mirror Cloudflare) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co;">
+  
+  <base href="./">
+  <title>Dream OS v2.1</title>
   <link rel="stylesheet" href="shell.css">
 </head>
 <body>
   <div id="app-shell"></div>
   <div id="toast-container"></div>
+  
+  <!-- Service Worker Registration (One-liner) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(console.error);
+    }
+  </script>
   <script type="module" src="shell.js"></script>
 </body>
 </html>
