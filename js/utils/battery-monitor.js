@@ -48,5 +48,3 @@ class BatteryMonitor {
 
 DREAM.utils = DREAM.utils || {};
 DREAM.utils.battery = new BatteryMonitor();
-
-export { BatteryMonitor };
