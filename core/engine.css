@@ -222,6 +222,41 @@ body {
     padding: var(--spacing-md);
 }
 
+
+
+/* Mobile Responsive untuk Bento Grid */
+@media (max-width: 768px) {
+    .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+    }
+    
+    .bento-large,
+    .bento-medium,
+    .bento-tall {
+        grid-column: span 2;
+        grid-row: auto;
+    }
+    
+    .bento-full {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 480px) {
+    .bento-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .bento-large,
+    .bento-medium,
+    .bento-small,
+    .bento-tall,
+    .bento-full {
+        grid-column: span 1;
+    }
+}
+
 /* ============================================================================
    BENTO GRID LAYOUT
    ============================================================================ */
@@ -272,39 +307,6 @@ body {
 
 .bento-full {
     grid-column: 1 / -1; /* Memenuhi semua kolom */
-}
-
-/* Mobile Responsive untuk Bento Grid */
-@media (max-width: 768px) {
-    .bento-grid {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: auto;
-    }
-    
-    .bento-large,
-    .bento-medium,
-    .bento-tall {
-        grid-column: span 2;
-        grid-row: auto;
-    }
-    
-    .bento-full {
-        grid-column: span 2;
-    }
-}
-
-@media (max-width: 480px) {
-    .bento-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .bento-large,
-    .bento-medium,
-    .bento-small,
-    .bento-tall,
-    .bento-full {
-        grid-column: span 1;
-    }
 }
 
 /* ============================================================================
