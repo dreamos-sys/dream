@@ -1,0 +1,124 @@
+/* ==========================================================================
+   DREAM ENGINE 2026 PRO - CSS CORE
+   ISO 27001 | 9001 | 55001 UI Standards
+   ========================================================================== */
+
+/* --- 1. BASE & VARIABLES --- */
+:root {
+    /* Emerald/Golden Theme */
+    --dream-primary: #10b981;
+    --dream-dark: #020617;
+    --dream-glass-bg: rgba(15, 23, 42, 0.45);
+    --dream-glass-border: rgba(16, 185, 129, 0.2);
+    --dream-gold: rgba(255, 215, 0, 0.8);
+    
+    /* Box Shadows */
+    --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --shadow-glow: 0 0 15px rgba(16, 185, 129, 0.4);
+}
+
+/* Typography Overrides */
+.font-arabic {
+    font-family: 'Amiri', serif;
+    line-height: 1.8;
+}
+
+/* --- 2. DYNAMIC BACKGROUND (5 Waktu Shalat) --- */
+/* Default to dark elegant gradient */
+.bg-dynamic-prayer {
+    background: linear-gradient(135deg, #020617 0%, #064e3b 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 15s ease infinite;
+    color: white;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* --- 3. GLASSMORPHISM ULTIMATE ENGINE --- */
+/* Memaksa GPU rendering (transform: translateZ) agar HP mid-range tetap smooth */
+.glass-wrapper, .glass-header, .glass-footer {
+    background: var(--dream-glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--dream-glass-border);
+    transform: translateZ(0); 
+    box-shadow: var(--shadow-glass);
+}
+
+/* Header Spesifik */
+.glass-header {
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+
+/* Footer Spesifik */
+.glass-footer {
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    border-bottom: none;
+}
+
+/* Teks Menyala (Glow Effect) */
+.text-glow {
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.8), 0 0 20px rgba(16, 185, 129, 0.4);
+}
+
+/* --- 4. NAVIGATION & BUTTONS --- */
+.nav-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-item.active {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    box-shadow: inset 0 0 10px rgba(16, 185, 129, 0.1);
+}
+
+.nav-item.active span {
+    color: var(--dream-primary);
+    text-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+/* --- 5. THE MAGIC 'ه' ICON ANIMATION --- */
+/* Animasi putar perlahan dan hover effect untuk AI Core */
+.rotating-magic {
+    animation: float-rotate 6s ease-in-out infinite;
+    filter: drop-shadow(0 0 12px var(--dream-gold));
+}
+
+@keyframes float-rotate {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(5deg) scale(1.05); }
+    100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* --- 6. PERFORMANCE FALLBACK (Ghost Architect Protocol) --- */
+/* Jika sistem mendeteksi baterai lemah, matikan blur untuk hemat daya */
+[data-performance="saver"] .glass-wrapper,
+[data-performance="saver"] .glass-header,
+[data-performance="saver"] .glass-footer {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(15, 23, 42, 0.95); /* Warna solid transparan */
+    box-shadow: none;
+}
+
+/* Custom Scrollbar supaya bersih */
+::-webkit-scrollbar {
+    width: 4px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(16, 185, 129, 0.3);
+    border-radius: 10px;
+}
