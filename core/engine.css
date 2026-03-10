@@ -239,12 +239,24 @@ body {
    GLASS MORPHISM EFFECTS
    ============================================================================ */
 
-.glass-header,
+/* ============================================================================
+   GLASS HEADER & FOOTER (menggunakan variabel)
+   ============================================================================ */
+
+.glass-header {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    border-bottom: 1px solid var(--glass-border);
+    padding-top: var(--safe-top);
+}
+
 .glass-footer {
-    background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid var(--color-border-primary);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    border-top: 1px solid var(--glass-border);
+    padding-bottom: var(--safe-bottom);
 }
 
 .glass-card {
