@@ -131,8 +131,11 @@
     <link rel="stylesheet" href="css/dream-engine-2026.css">
     
     <!-- Preload Critical Resources -->
-    <link rel="modulepreload" href="js/dream-core.js">
-    <link rel="modulepreload" href="js/ai-orchestrator.js">
+<link rel="modulepreload" href="js/dream-global.js">
+<link rel="modulepreload" href="js/dream-core.js">
+<link rel="modulepreload" href="js/ai-orchestrator.js">
+    
+    
 </head>
 
 <body>
@@ -332,78 +335,129 @@
     </div>
 
     <!-- ============================================================
-         SCRIPTS - MODULE LOADING
-         ============================================================ -->
-    
-    <!-- Font Awesome (Deferred) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
-    
-    <!-- Core Application Scripts -->
-    <script>
-        // Global Error Handler
-        window.addEventListener('error', (event) => {
-            console.error('[GLOBAL ERROR]', event.error);
-            const errorBoundary = document.getElementById('error-boundary');
-            const errorMessage = document.getElementById('error-message');
-            if (errorBoundary && errorMessage) {
-                errorMessage.textContent = event.error?.message || 'An unexpected error occurred';
-                errorBoundary.style.display = 'flex';
+     SCRIPTS - MODULE LOADING (FIXED)
+     ============================================================ -->
+
+<!-- Font Awesome (Deferred) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+
+<!-- 1. DREAM GLOBAL OBJECT - MUST LOAD FIRST! -->
+<script>
+    window.DREAM = {
+        version: '2026.1.0',
+        env: 'production',
+        state: {
+            currentModule: 'home',
+            user: null,
+            session: null,
+            prayerTimes: null,
+            networkStatus: navigator.onLine,
+            batteryLevel: null,
+            lastSync: null,
+            theme: 'dark',
+            language: 'id'
+        },
+        config: {
+            supabase: { url: 'https://your-project.supabase.co', key: 'your-anon-key' },
+            cloudflare: { workerUrl: 'https://your-worker.workers.dev' },
+            api: {
+                prayerTime: 'https://api.aladhan.com/v1/timingsByCity',
+                quran: 'https://api.alquran.cloud/v1'
             }
-        });
-
-        // Unhandled Promise Rejection
-        window.addEventListener('unhandledrejection', (event) => {
-            console.error('[UNHANDLED REJECTION]', event.reason);
-        });
-
-        // Performance Monitoring
-        if (window.performance && window.performance.mark) {
-            performance.mark('app-start');
-        }
-
-        // Service Worker Registration (PWA)
-        if ('serviceWorker' in navigator && location.protocol === 'https:') {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('[SW] Registered:', reg.scope))
-                    .catch(err => console.warn('[SW] Registration failed:', err));
-            });
-        }
-
-        // App Shell Ready
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('[APP] DOM Ready');
-            
-            // Hide loading screen after modules load
-            setTimeout(() => {
-                const loadingScreen = document.getElementById('loading-screen');
-                if (loadingScreen) {
-                    loadingScreen.classList.add('hidden');
-                    setTimeout(() => loadingScreen.remove(), 500);
-                }
-            }, 1000);
-        });
-    </script>
-    
-    <!-- Main Application Modules -->
-    <script type="module" src="js/dream-core.js"></script>
-    <script type="module" src="js/ai-orchestrator.js"></script>
-    
-    <!-- Analytics (Placeholder - Replace with your analytics) -->
-    <script>
-        // Analytics initialization
-        window.ANALYTICS = {
-            track: (event, data) => {
-                console.log('[ANALYTICS]', event, data);
-                // Integrate with your analytics service (Google Analytics, Mixpanel, etc.)
+        },
+        modules: new Map(),
+        cache: new Map(),
+        utils: {},
+        load: function(moduleName, params) {
+            console.log('[DREAM.load]', moduleName);
+            if (window.app && typeof window.app.loadModule === 'function') {
+                return window.app.loadModule(moduleName, params);
             }
-        };
-    </script>
+            console.warn('[DREAM] App not initialized yet');
+        },
+        showToast: function(message, type = 'info', duration = 3000) {
+            const container = document.getElementById('toast-container');
+            if (!container) { console.log('[TOAST]', message, type); return; }
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.style.cssText = `background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 1rem 1.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4); margin-bottom: 8px; color: #e2e8f0; font-size: 0.875rem;`;
+            if (type === 'success') toast.style.borderLeft = '4px solid #10b981';
+            if (type === 'error') toast.style.borderLeft = '4px solid #ef4444';
+            if (type === 'warning') toast.style.borderLeft = '4px solid #f59e0b';            toast.innerHTML = `<span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; toast.style.transition = 'all 0.3s ease-in-out'; setTimeout(() => toast.remove(), 300); }, duration);
+        },
+        trackEvent: function(eventName, data = {}) {
+            console.log('[ANALYTICS]', eventName, data);
+            if (window.ANALYTICS) { window.ANALYTICS.track(eventName, data); }
+        }
+    };
+    console.log('✅ [DREAM] Global object initialized');
+    console.log('🕌 Dream OS 2026 Version:', window.DREAM.version);
+</script>
 
-    <!-- Accessibility: Skip to Content Link -->
-    <a href="#core-module-container" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[10000] focus:bg-emerald-500 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg">
-        Skip to main content
-    </a>
+<!-- 2. Global Error Handler -->
+<script>
+    window.addEventListener('error', (event) => {
+        console.error('[GLOBAL ERROR]', event.error);
+        const errorBoundary = document.getElementById('error-boundary');
+        const errorMessage = document.getElementById('error-message');
+        if (errorBoundary && errorMessage) {
+            errorMessage.textContent = event.error?.message || 'An unexpected error occurred';
+            errorBoundary.style.display = 'flex';
+        }
+    });
+
+    window.addEventListener('unhandledrejection', (event) => {
+        console.error('[UNHANDLED REJECTION]', event.reason);
+    });
+
+    if (window.performance && window.performance.mark) {
+        performance.mark('app-start');
+    }
+
+    if ('serviceWorker' in navigator && location.protocol === 'https:') {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('[SW] Registered:', reg.scope))
+                .catch(err => console.warn('[SW] Registration failed:', err));
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('[APP] DOM Ready');
+        setTimeout(() => {
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) {
+                loadingScreen.classList.add('hidden');
+                setTimeout(() => loadingScreen.remove(), 500);
+            }
+        }, 1000);    });
+</script>
+
+<!-- 3. Utility Scripts (Non-module) -->
+<script src="js/utils/prayer-time.js" defer></script>
+<script src="js/utils/battery-monitor.js" defer></script>
+<script src="js/utils/network-monitor.js" defer></script>
+<script src="js/utils/storage.js" defer></script>
+
+<!-- 4. Main Application Modules (ES6) -->
+<script type="module" src="js/dream-core.js"></script>
+<script type="module" src="js/ai-orchestrator.js"></script>
+
+<!-- 5. Analytics -->
+<script>
+    window.ANALYTICS = {
+        track: (event, data) => {
+            console.log('[ANALYTICS]', event, data);
+        }
+    };
+</script>
+
+<!-- Accessibility: Skip to Content Link -->
+<a href="#core-module-container" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[10000] focus:bg-emerald-500 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg">
+    Skip to main content
+</a>
 
 </body>
 </html>
