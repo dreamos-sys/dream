@@ -1,0 +1,63 @@
+/* Container Utama - Tetep pake warna gelap khas Dream OS */
+body {
+  background: radial-gradient(circle at top, #1e293b, #0f172a); /* Mewah tapi irit dibanding gambar background */
+  color: #f8fafc;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+/* Header Bismillah & Shalawat - Floating & Glassy */
+.shell-header {
+  background: rgba(30, 41, 59, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  /* Blur cuma di header biar gak berat */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Grid Modul 3x3 Sesuai Konsep Awal */
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3x3 Grid Icon */
+  gap: 12px;
+  padding: 20px;
+}
+
+/* Kartu Modul - Efek Kaca Tanpa Blur (Irit Baterai & CPU) */
+.module-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform; /* Kasih tau browser ini bakal gerak */
+}
+
+.module-card:active {
+  transform: scale(0.92); /* Efek tactile yang mantap di tangan */
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Icon Modul - Pakai Drop Shadow Lembut buat efek 3D */
+.module-icon {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+  margin-bottom: 8px;
+}
+
+.module-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #cbd5e1;
+}
