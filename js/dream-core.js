@@ -20,13 +20,10 @@
 
 window.DREAM = {
     version: '2026.1.0',
-    state: {
-        currentModule: 'home',
-        user: null,
-        config: {},
-        modules: new Map(),
-        history: []
-    },
+    env: 'production',  // <-- TAMBAHKAN INI
+    state: { ... },
+    ...
+};
     
     // Module loading
     load: null,
