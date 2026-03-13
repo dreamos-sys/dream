@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dream OS v2.1 - Sovereign Edition</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="core/engine.css">
+</head>
+<body class="bg-slate-950 text-white overflow-x-hidden">
+    <div id="app-shell"></div>
+
+    <script src="js/kernel/antibody.js"></script>
+
+    <script>
+        // Global System Utils
+        window.DREAM_SYS = {
+            haptic: (p = 50) => { if ('vibrate' in navigator) navigator.vibrate(p); },
+            log: (t, m) => console.log(`%c[DREAM ${t.toUpperCase()}] %c${m}`, 'color:#10b981', 'color:inherit;')
+        };
+
+        window.DREAM_SECURITY = {
+            getFingerprint: () => {
+                try {
+                    const canvas = document.createElement('canvas');
+                    const gl = canvas.getContext('webgl');
+                    const renderer = gl ? gl.getParameter(gl.getExtension('WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL) : "";
+                    return btoa(`${screen.width}x${screen.height}|${renderer}|${navigator.hardwareConcurrency}`);
+                } catch (e) { return "unknown-dev"; }
+            }
+        };
+
+        window.DREAM = {
+            version: '2.1.0-Sovereign',
+            config: {
+                supabase: { url: 'https://pvznaeppaagylwddirla.supabase.co', key: 'EY_KEY_ANDA' },
+                safeZone: { radius: 5, center: { lat: -6.4025, lng: 106.7942 } }
+            },
+            state: { currentModule: 'home', isPanic: false },
+            load: (module) => { 
+                window.DREAM_SYS.haptic(20);
+                window.DREAM_SYS.log('info', 'Routing to: ' + module);
+            }
+        };
+    </script>
+
+    <script src="shell.js" defer></script>
+</body>
+</html>
