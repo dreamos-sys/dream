@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>DreamOS · Sys</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: #0b0f15;
+            color: #eef2f6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* shell header */
+        .shell-header {
+            background: #10141c;
+            backdrop-filter: blur(20px);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #2a2f3a;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            background: linear-gradient(145deg, #3b82f6, #8b5cf6);
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: white;
+            box-shadow: 0 8px 16px -6px rgba(59,130,246,0.4);
+        }
+
+        .logo-text {
+            font-weight: 600;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .shell-search {
+            background: #1e2430;
+            border: 1px solid #2f3542;
+            border-radius: 40px;
+            padding: 0.6rem 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1 1 280px;
+            max-width: 420px;
+            transition: all 0.2s;
+        }
+
+        .shell-search:focus-within {
+            border-color: #3b82f6;
+            background: #262d3b;
+        }
+
+        .shell-search span {
+            font-size: 1rem;
+            color: #7e8a98;
+        }
+
+        .shell-search input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+
+        .shell-search input::placeholder {
+            color: #5f6b7a;
+            font-weight: 400;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .notification-icon {
+            background: #1e2532;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: default;
+            border: 1px solid #313a48;
+        }
+
+        .avatar {
+            background: #2f3a4b;
+            width: 44px;
+            height: 44px;
+            border-radius: 40px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23a0aec0"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+            background-size: 50%;
+            background-position: center 55%;
+            background-repeat: no-repeat;
+            background-color: #28303f;
+            border: 2px solid #3b82f6;
+        }
+
+        /* main layout (shell) */
+        .app-shell {
+            display: flex;
+            flex: 1;
+        }
+
+        /* sidebar */
+        .sidebar {
+            background: #111620;
+            width: 270px;
+            border-right: 1px solid #222835;
+            padding: 1.5rem 0.75rem;
+            overflow-y: auto;
+            transition: width 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            font-weight: 600;
+            color: #6a788b;
+            padding: 0 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 0.8rem 1rem;
+            border-radius: 14px;
+            color: #b1c3db;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.15s;
+            cursor: default;
+            margin-bottom: 2px;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: #1e2636;
+            color: white;
+            border-color: #2e3a4f;
+        }
+
+        .nav-item.active {
+            background: #1f2a3f;
+            color: white;
+            border-left: 4px solid #3b82f6;
+            border-radius: 14px 10px 10px 14px;
+            font-weight: 600;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
+        }
+
+        .nav-icon {
+            font-size: 1.4rem;
+            width: 28px;
+            text-align: center;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+        }
+
+        .nav-item span:last-child {
+            line-height: 1.2;
+        }
+
+        /* main content */
+        .main-content {
+            flex: 1;
+            padding: 2rem 2rem 2.5rem;
+            overflow-y: auto;
+            background: #0d121b;
+        }
+
+        .grid-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .grid-header h1 {
+            font-weight: 600;
+            font-size: 2rem;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to bottom, #fff, #bdd3ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .date-badge {
+            background: #1a2330;
+            border-radius: 40px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            border: 1px solid #314159;
+            color: #b7c9e2;
+        }
+
+        /* feature grid – mencerminkan semua menu */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1.2rem;
+            margin-top: 1.5rem;
+        }
+
+        .feature-tile {
+            background: #141c28;
+            border: 1px solid #253040;
+            border-radius: 26px;
+            padding: 1.5rem 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: 0.15s ease;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .feature-tile:hover {
+            transform: translateY(-4px);
+            border-color: #3b82f6;
+            background: #17212f;
+            box-shadow: 0 16px 24px -8px #0a0f1a;
+        }
+
+        .feature-icon {
+            font-size: 2.4rem;
+            margin-bottom: 0.6rem;
+            filter: brightness(1.2);
+        }
+
+        .feature-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #d3e0fc;
+            text-transform: capitalize;
+        }
+
+        /* bottom status */
+        .shell-footer {
+            background: #0f151f;
+            border-top: 1px solid #222a36;
+            padding: 0.9rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            color: #8296af;
+            font-size: 0.9rem;
+        }
+
+        .footer-left span {
+            margin-right: 24px;
+        }
+
+        .footer-right span {
+            margin-left: 24px;
+        }
+
+        /* responsive */
+        @media (max-width: 800px) {
+            .sidebar {
+                width: 80px;
+                padding: 1rem 0.3rem;
+            }
+            .nav-item span:last-child {
+                display: none;
+            }
+            .nav-item {
+                justify-content: center;
+                padding: 0.9rem 0;
+            }
+            .nav-section-title {
+                text-align: center;
+                padding: 0;
+            }
+        }
+
+        /* utility */
+        .pill {
+            background: #1f2b3a;
+            border-radius: 40px;
+            padding: 0.2rem 1rem;
+            font-size: 0.8rem;
+            color: #9bb2d3;
+        }
+    </style>
+    <!-- shell.js akan dimuat sebagai module -->
+    <script src="shell.js" defer></script>
+</head>
+<body>
+    <!-- shell header (global) -->
+    <header class="shell-header">
+        <div class="logo-area">
+            <div class="logo-icon">D</div>
+            <span class="logo-text">dreamos · sys</span>
+        </div>
+        <div class="shell-search">
+            <span>🔍</span>
+            <input type="text" placeholder="Cepat: prediksi, stok, k3..." id="globalSearchInput">
+        </div>
+        <div class="user-badge">
+            <div class="notification-icon">🔔</div>
+            <div class="avatar" title="My Bro"></div>
+        </div>
+    </header>
+
+    <!-- app shell (sidebar + konten utama) -->
+    <div class="app-shell">
+        <!-- sidebar navigasi – semua fitur dari list -->
+        <aside class="sidebar" id="sidebar">
+            <div class="nav-section">
+                <div class="nav-section-title">utama</div>
+                <div class="nav-item active" data-key="home">
+                    <span class="nav-icon">🏠</span><span>Home</span>
+                </div>
+                <div class="nav-item" data-key="ai-panel">
+                    <span class="nav-icon">🤖</span><span>AI Panel</span>
+                </div>
+                <div class="nav-item" data-key="ai-speak">
+                    <span class="nav-icon">🗣️</span><span>AI Speak</span>
+                </div>
+                <div class="nav-item" data-key="prediction">
+                    <span class="nav-icon">📈</span><span>Prediction</span>
+                </div>
+                <div class="nav-item" data-key="booking">
+                    <span class="nav-icon">📅</span><span>Booking</span>
+                </div>
+                <div class="nav-item" data-key="asset">
+                    <span class="nav-icon">📦</span><span>Asset</span>
+                </div>
+                <div class="nav-item" data-key="stok">
+                    <span class="nav-icon">🥫</span><span>Stok</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">petugas & Keamanan</div>
+                <div class="nav-item" data-key="sekuriti">
+                    <span class="nav-icon">🔒</span><span>Sekuriti</span>
+                </div>
+                <div class="nav-item" data-key="k3">
+                    <span class="nav-icon">⛑️</span><span>K3</span>
+                </div>
+                <div class="nav-item" data-key="k3-officer">
+                    <span class="nav-icon">🛡️</span><span>K3 Officer</span>
+                </div>
+                <div class="nav-item" data-key="janitor-indoor">
+                    <span class="nav-icon">🧹</span><span>Janitor Indoor</span>
+                </div>
+                <div class="nav-item" data-key="janitor-outdoor">
+                    <span class="nav-icon">🌿</span><span>Janitor Outdoor</span>
+                </div>
+                <div class="nav-item" data-key="ghost">
+                    <span class="nav-icon">👻</span><span>Ghost</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">sistem & Lainnya</div>
+                <div class="nav-item" data-key="qr">
+                    <span class="nav-icon">📱</span><span>QR</span>
+                </div>
+                <div class="nav-item" data-key="weather">
+                    <span class="nav-icon">☁️</span><span>Weather</span>
+                </div>
+                <div class="nav-item" data-key="maintenance">
+                    <span class="nav-icon">⚙️</span><span>Maintenance</span>
+                </div>
+                <div class="nav-item" data-key="settings">
+                    <span class="nav-icon">⚙️</span><span>Settings</span>
+                </div>
+                <div class="nav-item" data-key="profile">
+                    <span class="nav-icon">👤</span><span>Profile</span>
+                </div>
+                <div class="nav-item" data-key="login">
+                    <span class="nav-icon">🔑</span><span>Login</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- main content area (dinamis) -->
+        <main class="main-content" id="mainContent">
+            <div class="grid-header">
+                <h1 id="contentTitle">Home</h1>
+                <div class="date-badge" id="dateDisplay">Jumat, 14 Mar 2026</div>
+            </div>
+
+            <!-- container grid semua fitur (untuk home) -->
+            <div id="featureContainer" class="feature-grid"></div>
+
+            <!-- container detail untuk konten lain (akan diisi shell.js) -->
+            <div id="detailViewContainer"></div>
+        </main>
+    </div>
+
+    <!-- footer / status bar -->
+    <footer class="shell-footer">
+        <div class="footer-left">
+            <span>⚡ dreamos · sys v2.6</span>
+            <span class="pill">My Bro</span>
+        </div>
+        <div class="footer-right">
+            <span id="weatherFooter">☀️ 28°C</span>
+            <span>🧑‍💼 12 online</span>
+        </div>
+    </footer>
+
+    <script>
+        // inline minimal biar tanggal dinamis, sisanya diserahkan ke shell.js
+        (function updateDate() {
+            const d = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('dateDisplay').innerText = d.toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+        })();
+    </script>
+</body>
+</html>
