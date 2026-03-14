@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Dream OS v2.1 - Sovereign Enterprise</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Core CSS -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #0f172a; 
+            color: #e2e8f0; 
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        :root {
+            --color-primary: #10b981;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+    </style>
+    
+    <!-- Prevent Jekyll from ignoring folders -->
+</head>
+<body class="bg-slate-950">
+    <div id="app-shell"></div>
+
+    <!-- ============================================================
+         KERNEL & IMMUNITY (LOAD FIRST - NO DEFER)
+         ============================================================ -->
+    <script src="js/kernel/antibody.js"></script>
+    <script src="js/kernel/sovereign-kernel.js"></script>
+    <script src="js/kernel/brain-hub.js"></script>
+
+    <!-- ============================================================
+         SYSTEM CONFIG & DREAM GLOBAL
+         ============================================================ -->
+    <script>
+        window.DREAM_SYS = {
+            haptic: (p = 50) => { if ('vibrate' in navigator) navigator.vibrate(p); },
+            log: (t, m) => console.log(`%c[DREAM ${t.toUpperCase()}] %c${m}`, 'color:#10b981', 'color:inherit;')
+        };
+
+        window.DREAM_SECURITY = {
+            getFingerprint: () => {
+                try {
+                    const canvas = document.createElement('canvas');
+                    const gl = canvas.getContext('webgl');
+                    const renderer = gl ? gl.getParameter(gl.getExtension('WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL) : "";
+                    return btoa(`${screen.width}x${screen.height}|${renderer}|${navigator.hardwareConcurrency}`);
+                } catch (e) {
+                    return 'unknown';
+                }
+            }
+        };
+
+        window.DREAM = {
+            version: '2.1.0-Sovereign',
+            state: { module: 'home', isShadow: false },
+            config: {
+                supabase: { 
+                    url: 'https://pvznaeppaagylwddirla.supabase.co', 
+                    key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2em5hZXBwYWFneWx3ZGRpcmxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NTEwNDMsImV4cCI6MjA4NzUyNzA0M30.t9SJi3VfsBDkKmeZ3egZ4rbvljl4xe0WwNkPtfA9-vo'
+                },
+                safeZone: { center: { lat: -6.4025, lng: 106.7942 } } // Depok Core
+            },
+            load: (mod) => {
+                window.DREAM_SYS.haptic(30);
+                window.DREAM_SYS.log('info', `Switching to: ${mod}`);
+                // Module routing logic - will be enhanced by shell.js
+                console.log(`[DREAM] Loading module: ${mod}`);
+                
+                // You can add actual routing logic here later
+                // For now, just update UI state
+                if (window.DREAM.state) {
+                    window.DREAM.state.module = mod;
+                }
+                
+                // Show feedback (remove this when real modules are ready)
+                if (mod !== 'home') {
+                    alert(`🚀 Module "${mod}" akan segera hadir!\n\n(Integrasi backend dalam pengembangan)`);
+                }
+            }
+        };
+    </script>
+
+    <!-- ============================================================
+         SHELL UI (DEFER - JALANKAN SETELAH DOM SIAP)
+         ============================================================ -->
+    <script src="shell.js" defer></script>
+</body>
+</html>
