@@ -1,21 +1,25 @@
-/* GHOST TRIGGER - Diperbaiki agar tidak memblokir tombol lain */
+/* GHOST TRIGGER - Diperbaiki total agar tidak memblokir tombol */
 #ghost-trigger-header {
     position: fixed; top: 0; right: 0; 
     width: 60px; height: 60px; 
     z-index: 2147483647; 
     background: transparent;
-    pointer-events: all; /* Hanya aktif di area pojok kanan atas */
+    pointer-events: none; /* Klik akan menembus ke menu di bawahnya */
 }
 
-/* Bento Grid System */
+/* Bento Grid System untuk Dashboard */
 .bento-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; padding: 1rem;
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 1rem; 
+    padding: 1rem;
 }
 .bento-card {
-    background: #ffffff; padding: 1.5rem; border-radius: 1.5rem;
+    background: #ffffff; 
+    padding: 1.5rem; 
+    border-radius: 1.5rem;
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
 }
-.bento-large { grid-column: span 2; }
 
 /* Loader Fix */
 #system-loader {
