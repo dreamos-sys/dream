@@ -1,0 +1,64 @@
+/* * Dream OS v13.5 - Global Style 
+ * Optimized for Xiaomi Redmi Note 9 Pro
+ */
+
+:root {
+    --ghost-emerald: #10b981;
+    --immunity-blue: #3b82f6;
+    --danger-pulse: #ef4444;
+    --bg-dark: #020617;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-dark);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #e2e8f0;
+    overflow-x: hidden;
+    height: 100vh;
+}
+
+/* Glassmorphism Standard ISO */
+.glass-card {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+}
+
+/* Immunity Pulse - Visual System Health */
+@keyframes immunity-glow {
+    0% { box-shadow: inset 0 0 15px rgba(16, 185, 129, 0.2); }
+    50% { box-shadow: inset 0 0 30px rgba(16, 185, 129, 0.4); }
+    100% { box-shadow: inset 0 0 15px rgba(16, 185, 129, 0.2); }
+}
+
+.system-healthy {
+    animation: immunity-glow 4s infinite ease-in-out;
+}
+
+/* Hidden Ghost Trigger Zone */
+#ghost-trigger-zone {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    z-index: 9999;
+    cursor: none;
+    background: transparent; /* Benar-benar stealth */
+}
+
+/* Viewport for Modules */
+#main-viewport {
+    width: 100%;
+    min-height: 100vh;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom Scrollbar untuk vibe Developer */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--ghost-emerald); border-radius: 10px; }
