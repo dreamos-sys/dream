@@ -1,78 +1,74 @@
 /**
- * QR Scanner Module - Dream OS 2026
- * Bismillah Standard
+ * modules/qr/module.js
+ * Dream OS v2.1 - QR Scanner Module
  */
 
-export default async function({ container, services, user }) {
-    console.log('[QR MODULE] Initializing...');
-    
-    container.innerHTML = `
-        <div class="qr-scanner-container" style="padding: 2rem; text-align: center;">
-            <h2 class="text-xl font-bold mb-4" style="color: var(--dream-primary);">
-                📷 QR Scanner
-            </h2>
-            
-            <div id="qr-video" style="width: 100%; max-width: 400px; margin: 0 auto; background: #000; border-radius: 16px; overflow: hidden;">
-                <video id="qr-video-element" autoplay playsinline style="width: 100%;"></video>
-            </div>
-            
-            <div id="qr-result" class="mt-4 p-4 rounded-xl" style="background: rgba(16, 185, 129, 0.1); display: none;">
-                <p class="text-sm" style="color: var(--dream-text);">Result: <span id="qr-data"></span></p>
-            </div>
-            
-            <div class="mt-6 flex gap-4 justify-center">
-                <button id="btn-start-scan" class="btn-primary">
-                    <i class="fas fa-camera"></i> Start Scan
-                </button>
-                <button id="btn-stop-scan" class="btn-primary" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
-                    <i class="fas fa-stop"></i> Stop
-                </button>
-            </div>
-            
-            <p class="mt-4 text-xs" style="color: var(--dream-text-muted);">
-                🔒 Scan QR Code untuk akses fasilitas
-            </p>
+export async function render({ container, user, supabase }) {
+    return `
+        <div class="module-container active" id="module-qr">
+            <header class="glass-header">
+                <div class="status-bar">
+                    <span>📍 DEPOK CORE</span>
+                    <span>ISO 27001 ✅</span>
+                </div>
+                <div class="islamic-header">
+                    <h1 class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</h1>
+                    <p class="shalawat">اَللهم صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ</p>
+                </div>
+            </header>
+
+            <main style="padding:16px;padding-bottom:140px;">
+                <h2 class="text-2xl font-bold text-emerald-400 mb-6">📷 QR Scanner</h2>
+                
+                <div class="glass-card p-6 mb-6">
+                    <div style="text-align:center;padding:40px 20px;">
+                        <div style="font-size:4rem;margin-bottom:1rem;">📷</div>
+                        <h3 style="color:var(--text-primary);font-size:1.5rem;margin-bottom:10px;">QR Scanner</h3>
+                        <p style="color:var(--text-muted);margin-bottom:20px;">Scan QR codes for facility access</p>
+                        
+                        <button onclick="startScan()" style="padding:16px 32px;background:var(--color-primary);color:white;border:none;border-radius:12px;cursor:pointer;font-size:1rem;font-weight:600;">
+                            📷 Start Scanner
+                        </button>
+                        
+                        <div id="scan-result" style="margin-top:20px;padding:1rem;background:rgba(16,185,129,0.1);border-radius:8px;display:none;">
+                            <p style="color:var(--color-primary);">Scan Result: <span id="result-text"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <nav class="bottom-nav">
+                <div class="nav-container">
+                    <button class="nav-item" data-nav="home" onclick="window.loadModule('home')">
+                        <i class="fas fa-home"></i><span>Home</span>
+                    </button>
+                    <button class="nav-item active" data-nav="qr" onclick="window.loadModule('qr')">
+                        <i class="fas fa-qrcode"></i><span>QR Scanner</span>
+                    </button>
+                    <button class="nav-item" data-nav="settings" onclick="window.loadModule('settings')">
+                        <i class="fas fa-sliders"></i><span>Settings</span>
+                    </button>
+                </div>
+            </nav>
         </div>
     `;
+}
+
+export async function afterRender() {
+    console.log('📷 [QR] Module loaded');
     
-    // QR Scanner Logic
-    let stream = null;
-    const video = document.getElementById('qr-video-element');
-    const resultDiv = document.getElementById('qr-result');
-    const qrData = document.getElementById('qr-data');
-    const btnStart = document.getElementById('btn-start-scan');
-    const btnStop = document.getElementById('btn-stop-scan');
-    
-    // Start Scan
-    btnStart?.addEventListener('click', async () => {
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: 'environment' } 
-            });
-            video.srcObject = stream;
-            services?.toast?.('Kamera aktif, arahkan ke QR Code', 'success');
-            hapticFeedback('success');
-        } catch (err) {
-            console.error('[QR] Camera error:', err);
-            services?.toast?.('Gagal akses kamera', 'error');
-            hapticFeedback('error');
+    window.startScan = function() {
+        const result = document.getElementById('scan-result');
+        const resultText = document.getElementById('result-text');
+        if (result && resultText) {
+            result.style.display = 'block';
+            resultText.textContent = 'Camera permission required (Coming Soon v2.2)';
+            window.toast?.('Camera access coming in v2.2', 'info');
         }
-    });
-    
-    // Stop Scan
-    btnStop?.addEventListener('click', () => {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            video.srcObject = null;
-            services?.toast?.('Scanner dihentikan', 'info');
-        }
-    });
-    
-    // Cleanup on module close
-    return function cleanup() {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-        }
-        console.log('[QR MODULE] Cleaned up');
     };
+}
+
+export function cleanup() {
+    console.log('📷 [QR] Module cleanup');
+    delete window.startScan;
 }
