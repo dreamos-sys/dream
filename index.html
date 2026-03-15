@@ -2,43 +2,90 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dream OS v13.6 - Sovereign LUX</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no, viewport-fit=cover">
+    <title>Dream OS v2.1 - Sovereign Enterprise</title>
+    
+    <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Manifest & Icons -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/icons/logo_haa.svg">
+    <link rel="apple-touch-icon" href="./assets/icons/icon-192x192.png">
+    
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="core/style.css">
+    
+    <!-- Theme Manager (Load First) -->
+    <script type="module" src="js/utils/theme-manager.js"></script>
 </head>
-<body class="system-healthy">
-
-    <div id="ghost-header-trigger"></div>
-
-    <div id="system-loader">
-        <div class="loader-content">
-            <div class="bismillah">Bismillah bi idznillah</div>
-            <h1 class="logo-text">DREAM OS</h1>
-            <div class="loader-bar"></div>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div style="text-align:center;">
+            <div class="loader"></div>
+            <p style="margin-top:1rem;color:var(--color-primary);font-size:0.875rem;">Bismillah bi idznillah</p>
+            <h1 style="margin-top:0.5rem;color:var(--color-text);font-size:2rem;letter-spacing:2px;">DREAM OS</h1>
+            <div style="width:200px;height:2px;background:rgba(16,185,129,0.3);margin:1rem auto;border-radius:2px;overflow:hidden;">
+                <div id="loading-bar" style="width:0%;height:100%;background:var(--color-primary);transition:width 0.3s;"></div>
+            </div>
         </div>
     </div>
 
-    <main id="root-viewport"></main>
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
 
-    <nav class="bottom-nav" id="main-nav" style="display: none;">
-        <div class="nav-item active" onclick="DREAM.load('home')">
-            <i class="fa-solid fa-house"></i><span>Home</span>
-        </div>
-        <div class="nav-item" onclick="DREAM.load('k3')">
-            <i class="fa-solid fa-triangle-exclamation"></i><span>K3</span>
-        </div>
-        <div class="nav-center">
-            <div class="shalawat-btn" onclick="DREAM.haptic(100)">صلوات</div>
-        </div>
-        <div class="nav-item" onclick="DREAM.load('asset')">
-            <i class="fa-solid fa-boxes-stacked"></i><span>Aset</span>
-        </div>
-        <div class="nav-item" onclick="DREAM.load('settings')">
-            <i class="fa-solid fa-gear"></i><span>Sistem</span>
-        </div>
-    </nav>
+    <!-- App Shell -->
+    <div id="app-shell" style="display:none;"></div>
 
-    <script src="shell.js" type="module"></script>
+    <!-- DREAM SYS GLOBAL -->
+    <script>
+        window.DREAM_SYS = {
+            haptic: (p = 50) => { if ('vibrate' in navigator) navigator.vibrate(p); },
+            log: (t, m) => console.log(`%c[DREAM ${t.toUpperCase()}] %c${m}`, 'color:#10b981', 'color:inherit;'),
+            toast: (msg, type = 'success') => {
+                const icons = { success:'✅', error:'❌', warning:'⚠️', info:'ℹ️' };
+                const el = document.createElement('div');
+                el.className = `toast toast-${type}`;
+                el.innerHTML = `<span>${icons[type]}</span><span>${String(msg).replace(/</g,'<')}</span>`;
+                const container = document.getElementById('toast-container');
+                if (container) {
+                    container.appendChild(el);
+                    setTimeout(() => { el.style.opacity='0'; setTimeout(() => el.remove(), 350); }, 3500);
+                }
+            }
+        };
+
+        window.DREAM = {
+            version: '2.1.0-Sovereign',
+            state: { module: 'home', user: null, isShadow: false, modules: new Map() },
+            config: {
+                supabase: { 
+                    url: 'https://pvznaeppaagylwddirla.supabase.co', 
+                    key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2em5hZXBwYWFneWx3ZGRpcmxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NTEwNDMsImV4cCI6MjA4NzUyNzA0M30.t9SJi3VfsBDkKmeZ3egZ4rbvljl4xe0WwNkPtfA9-vo'
+                }
+            },
+            load: async (key) => {
+                window.DREAM_SYS.haptic(30);
+                if (key === 'home') { location.reload(); return; }
+                try {
+                    const mod = await import(`./modules/${key}/module.js`);
+                    document.body.innerHTML = '<div id="module-container"></div><div id="toast-container"></div>';
+                    const container = document.getElementById('module-container');
+                    if (mod.default) {
+                        await mod.default({ container, user: window.DREAM.state.user });
+                    }
+                    window.DREAM.state.module = key;
+                } catch(err) {
+                    console.error('Module load failed:', err);
+                    window.DREAM_SYS.toast(`Failed to load: ${key}`, 'error');
+                }
+            }
+        };
+    </script>
+
+    <!-- Shell UI -->
+    <script src="shell.js" defer></script>
 </body>
 </html>
