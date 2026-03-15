@@ -1,8 +1,4 @@
-/**
- * 🏠 HOME MODULE - Dream OS v2.1
- * Tampilan dikembalikan ke versi Dark Theme + Shalawat Bottom Nav
- */
-
+/** 🏠 HOME MODULE - Dream OS v2.1 (FIXED) */
 export default async function({ container, supabase, user }) {
     
     // --- SVG ICONS DEFINITION ---
@@ -19,79 +15,77 @@ export default async function({ container, supabase, user }) {
     };
 
     // --- RENDER UI ---
+    // Pastikan menggunakan BACKTICK (`) di awal dan akhir innerHTML
     container.innerHTML = `
-    <div style="background-color: #0b1120; min-height: 100vh; width: 100%; position: relative; padding-bottom: 90px; color: #e2e8f0; font-family: 'Inter', sans-serif;">
+    <div style="background-color: #0b1120; min-height: 100vh; width: 100%; position: relative; padding-bottom: 100px; color: #e2e8f0;">
         
-        <div style="height: 20px;"></div>
-
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; max-width: 600px; margin: 0 auto;">
             
-            <div onclick="window.DREAM.load('command-center')" style="background: #1e293b; border-radius: 20px; padding: 25px 15px; text-align: center; cursor: pointer; transition: transform 0.2s;">
-                <div style="margin-bottom: 12px; display: flex; justify-content: center;">${icons.cmd}</div>
-                <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 5px;">COMMAND CENTER</div>
-                <div style="font-size: 9px; color: #64748b; font-style: italic;">Pusat kendali</div>
+            <div onclick="window.DREAM.load('command-center')" style="background: #1e293b; border-radius: 20px; padding: 25px 15px; text-align: center; cursor: pointer;">
+                <div style="margin-bottom: 12px; display: flex; justify-content: center;">\${icons.cmd}</div>
+                <div style="font-size: 11px; font-weight: 800; margin-bottom: 5px;">COMMAND CENTER</div>
+                <div style="font-size: 9px; color: #64748b;">Pusat kendali</div>
             </div>
 
-            <div onclick="window.DREAM.load('booking')" style="background: #1e293b; border-radius: 20px; padding: 25px 15px; text-align: center; cursor: pointer; transition: transform 0.2s;">
-                <div style="margin-bottom: 12px; display: flex; justify-content: center;">${icons.booking}</div>
-                <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 5px;">BOOKING</div>
-                <div style="font-size: 9px; color: #64748b; font-style: italic;">Pemesanan ruangan</div>
+            <div onclick="window.DREAM.load('booking')" style="background: #1e293b; border-radius: 20px; padding: 25px 15px; text-align: center; cursor: pointer;">
+                <div style="margin-bottom: 12px; display: flex; justify-content: center;">\${icons.booking}</div>
+                <div style="font-size: 11px; font-weight: 800; margin-bottom: 5px;">BOOKING</div>
+                <div style="font-size: 9px; color: #64748b;">Pemesanan ruangan</div>
             </div>
 
-            <div onclick="window.DREAM.load('k3')" style="background: #1e293b; border-radius: 20px; padding: 25px 15px; text-align: center; cursor: pointer; transition: transform 0.2s;">
-                <div style="margin-bottom: 12px; display: flex; justify-content: center;">${icons.k3}</div>
-                <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 5px;">K3</div>
-                <div style="font-size: 9px; color: #64748b; font-style: italic;">Keselamatan & kesehatan</div>
+            <div onclick="window.DREAM.load('k3')" style="background: #1e293b; border-radius: 20px; padding: 25px 15px; text-align: center; cursor: pointer;">
+                <div style="margin-bottom: 12px; display: flex; justify-content: center;">\${icons.k3}</div>
+                <div style="font-size: 11px; font-weight: 800; margin-bottom: 5px;">K3</div>
+                <div style="font-size: 9px; color: #64748b;">Keselamatan & kesehatan</div>
             </div>
 
-            <div onclick="window.DREAM.load('sekuriti')" style="background: #1e293b; border-radius: 20px; padding: 25px 15px; text-align: center; cursor: pointer; transition: transform 0.2s;">
-                <div style="margin-bottom: 12px; display: flex; justify-content: center;">${icons.sekuriti}</div>
-                <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 5px;">SEKURITI</div>
-                <div style="font-size: 9px; color: #64748b; font-style: italic;">Keamanan & kehilangan</div>
+            <div onclick="window.DREAM.load('sekuriti')" style="background: #1e293b; border-radius: 20px; padding: 25px 15px; text-align: center; cursor: pointer;">
+                <div style="margin-bottom: 12px; display: flex; justify-content: center;">\${icons.sekuriti}</div>
+                <div style="font-size: 11px; font-weight: 800; margin-bottom: 5px;">SEKURITI</div>
+                <div style="font-size: 9px; color: #64748b;">Keamanan & kehilangan</div>
             </div>
 
-            <div onclick="window.DREAM.load('janitor-in')" style="background: #1e293b; border-radius: 20px; padding: 25px 15px; text-align: center; cursor: pointer; transition: transform 0.2s;">
-                <div style="margin-bottom: 12px; display: flex; justify-content: center;">${icons.janitorIn}</div>
-                <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 5px;">JANITOR IN</div>
-                <div style="font-size: 9px; color: #64748b; font-style: italic;">Kebersihan indoor</div>
+            <div onclick="window.DREAM.load('janitor-indoor')" style="background: #1e293b; border-radius: 20px; padding: 25px 15px; text-align: center; cursor: pointer;">
+                <div style="margin-bottom: 12px; display: flex; justify-content: center;">\${icons.janitorIn}</div>
+                <div style="font-size: 11px; font-weight: 800; margin-bottom: 5px;">JANITOR IN</div>
+                <div style="font-size: 9px; color: #64748b;">Kebersihan indoor</div>
             </div>
 
-            <div onclick="window.DREAM.load('janitor-out')" style="background: #1e293b; border-radius: 20px; padding: 25px 15px; text-align: center; cursor: pointer; transition: transform 0.2s;">
-                <div style="margin-bottom: 12px; display: flex; justify-content: center;">${icons.janitorOut}</div>
-                <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 5px;">JANITOR OUT</div>
-                <div style="font-size: 9px; color: #64748b; font-style: italic;">Kebersihan outdoor</div>
+            <div onclick="window.DREAM.load('janitor-outdoor')" style="background: #1e293b; border-radius: 20px; padding: 25px 15px; text-align: center; cursor: pointer;">
+                <div style="margin-bottom: 12px; display: flex; justify-content: center;">\${icons.janitorOut}</div>
+                <div style="font-size: 11px; font-weight: 800; margin-bottom: 5px;">JANITOR OUT</div>
+                <div style="font-size: 9px; color: #64748b;">Kebersihan outdoor</div>
             </div>
 
         </div>
 
-        <div style="position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: #1e293b; border-top-left-radius: 24px; border-top-right-radius: 24px; display: flex; justify-content: space-around; align-items: center; padding: 0 10px; box-shadow: 0 -5px 20px rgba(0,0,0,0.3); z-index: 999; max-width: 600px; margin: 0 auto;">
+        <div style="position: fixed; bottom: 0; left: 0; right: 0; height: 80px; background: #1e293b; border-top-left-radius: 25px; border-top-right-radius: 25px; display: flex; justify-content: space-around; align-items: center; z-index: 1000; max-width: 600px; margin: 0 auto; box-shadow: 0 -10px 30px rgba(0,0,0,0.5);">
             
-            <div onclick="window.DREAM.load('home')" style="display: flex; flex-direction: column; align-items: center; cursor: pointer; color: #10b981; flex: 1;">
-                <div style="margin-bottom: 3px;">${icons.home}</div>
-                <div style="font-size: 10px; font-weight: 600;">Home</div>
+            <div onclick="window.DREAM.load('home')" style="text-align: center; color: #10b981; flex: 1;">
+                <div>\${icons.home}</div>
+                <div style="font-size: 10px; margin-top: 4px;">Home</div>
             </div>
 
-            <div onclick="window.DREAM.load('k3')" style="display: flex; flex-direction: column; align-items: center; cursor: pointer; color: #64748b; flex: 1;">
-                <div style="margin-bottom: 3px;">${icons.k3.replace('width="28" height="28"', 'width="22" height="22"').replace('#10b981', 'currentColor')}</div>
-                <div style="font-size: 10px; font-weight: 600;">K3</div>
+            <div onclick="window.DREAM.load('k3')" style="text-align: center; color: #64748b; flex: 1;">
+                <div>\${icons.k3.replace('28', '22').replace('28', '22').replace('#10b981', 'currentColor')}</div>
+                <div style="font-size: 10px; margin-top: 4px;">K3</div>
             </div>
 
-            <div onclick="alert('اللهم صل على سيدنا محمد\\nAllahumma sholli ala Sayyidina Muhammad')" style="position: relative; top: -25px; width: 70px; height: 70px; background: #10b981; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 6px solid #0b1120; cursor: pointer; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); flex-shrink: 0;">
-                <span style="font-family: 'Amiri', 'Traditional Arabic', serif; font-size: 18px; color: #0b1120; font-weight: 900; transform: translateY(-2px);">صلوات</span>
+            <div onclick="alert('اللهم صل على سيدنا محمد')" style="position: relative; top: -25px; width: 75px; height: 75px; background: #10b981; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 8px solid #0b1120; box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);">
+                <span style="font-size: 18px; color: #0b1120; font-weight: 900;">صلوات</span>
             </div>
 
-            <div onclick="window.DREAM.load('asset')" style="display: flex; flex-direction: column; align-items: center; cursor: pointer; color: #64748b; flex: 1;">
-                <div style="margin-bottom: 3px;">${icons.asset}</div>
-                <div style="font-size: 10px; font-weight: 600;">Aset</div>
+            <div onclick="window.DREAM.load('asset')" style="text-align: center; color: #64748b; flex: 1;">
+                <div>\${icons.asset}</div>
+                <div style="font-size: 10px; margin-top: 4px;">Aset</div>
             </div>
 
-            <div onclick="window.DREAM.load('setting')" style="display: flex; flex-direction: column; align-items: center; cursor: pointer; color: #64748b; flex: 1;">
-                <div style="margin-bottom: 3px;">${icons.setting}</div>
-                <div style="font-size: 10px; font-weight: 600;">Sistem</div>
+            <div onclick="window.DREAM.load('setting')" style="text-align: center; color: #64748b; flex: 1;">
+                <div>\${icons.setting}</div>
+                <div style="font-size: 10px; margin-top: 4px;">Sistem</div>
             </div>
 
         </div>
     </div>
     `;
-
-    
+}
