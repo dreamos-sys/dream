@@ -1,52 +1,89 @@
-class GhostArchitect {
+/**
+ * SOVEREIGN KERNEL v13.6
+ * Integrated with Brain Hub LUX v3.5
+ */
+
+const MODULES = {
+    'home': { path: './modules/home.js' },
+    'k3': { path: './modules/k3.js' },
+    'asset': { path: './modules/asset.js' },
+    'settings': { path: './modules/settings.js' },
+    'ghost': { path: './modules/ghost/brain-hub.js' }
+};
+
+class SovereignShell {
     constructor() {
-        this.basePath = window.location.origin + window.location.pathname.split('index.html')[0];
-        window.DREAM = this;
+        this.ghostCounter = 0;
+        this.ghostTimer = null;
         this.init();
     }
 
-    async init() {
-        console.log("Bismillah, Architect Mode Active.");
-        this.load('home');
-        this.setupGhostTrigger();
+    init() {
+        window.DREAM = this;
+        console.log("⚡ Sovereign Kernel Active.");
+        
+        // Ghost Header Trigger Logic
+        document.getElementById('ghost-header-trigger').onclick = () => this.handleGhostClick();
+
+        // Boot Sequence
+        setTimeout(() => this.load('home'), 1500);
     }
 
-    async load(moduleName) {
-        const vp = document.getElementById('app-viewport');
+    async load(key) {
+        this.haptic(40);
+        const viewport = document.getElementById('root-viewport');
+        const loader = document.getElementById('system-loader');
+        const nav = document.getElementById('main-nav');
+        const mod = MODULES[key];
+
+        if (!mod) return;
+
         try {
-            // Path sinkron dengan folder GitHub Anda
-            const path = `${this.basePath}modules/${moduleName}/index.js?v=${Date.now()}`;
-            const module = await import(path);
+            // Import module dengan cache buster agar selalu fresh
+            const { default: renderModule } = await import(`${mod.path}?v=${Date.now()}`);
             
-            vp.innerHTML = '<div class="flex justify-center p-10"><i class="fas fa-spinner fa-spin text-emerald-500 text-3xl"></i></div>';
-            
-            // Passing all services ke module
-            await module.default({ 
-                container: vp,
-                supabase: window.supabase, // Asumsi sudah diload di index
-                user: { role: 'architect' }
-            });
+            viewport.innerHTML = ''; 
+            await renderModule({ container: viewport, user: { email: 'girangati1001@gmail.com', role: 'architect' } });
+
+            // Smooth Transition
+            if(loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+            }
+            nav.style.display = 'flex';
+            this.updateNav(key);
 
         } catch (err) {
-            vp.innerHTML = `
-                <div class="p-10 text-center">
-                    <div class="text-red-500 mb-4 text-5xl">⚠️</div>
-                    <h2 class="text-xl font-bold">Bismillah, File Missing</h2>
-                    <p class="text-slate-400 text-sm mt-2">Folder: /modules/${moduleName}/index.js</p>
-                    <button onclick="location.reload()" class="mt-6 bg-emerald-600 px-6 py-2 rounded-full text-xs">REPAIR SYSTEM</button>
-                </div>`;
+            console.error(`[KERNEL ERROR] Failed to load ${key}:`, err);
+            // Emergency Antibody: Reload if stuck
+            alert("Sistem mendeteksi anomali. Meregenerasi...");
+            location.reload();
         }
     }
 
-    setupGhostTrigger() {
-        let clicks = 0;
-        document.getElementById('ghost-mode-trigger').onclick = () => {
-            clicks++;
-            if(clicks === 7) {
-                alert("GHOST ARCHITECT MODE: UNLOCKED");
-                this.load('admin-console');
-            }
-        };
+    handleGhostClick() {
+        this.ghostCounter++;
+        this.haptic(30);
+        clearTimeout(this.ghostTimer);
+        this.ghostTimer = setTimeout(() => this.ghostCounter = 0, 2000);
+
+        if (this.ghostCounter >= 5) {
+            console.log("👻 Ghost Sequence Validated.");
+            this.ghostCounter = 0;
+            this.load('ghost');
+        }
+    }
+
+    updateNav(key) {
+        document.querySelectorAll('.nav-item').forEach(el => {
+            el.classList.remove('active');
+            if (el.getAttribute('onclick')?.includes(`'${key}'`)) el.classList.add('active');
+        });
+    }
+
+    haptic(ms) {
+        if (navigator.vibrate) navigator.vibrate(ms);
     }
 }
-new GhostArchitect();
+
+new SovereignShell();
