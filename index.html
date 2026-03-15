@@ -94,11 +94,4 @@ export default async function({ container, supabase, user }) {
     </div>
     `;
 
-    // Efek hover sederhana (Opsional untuk UX yang lebih baik)
-    const cards = container.querySelectorAll('.grid > div');
-    cards.forEach(card => {
-        card.addEventListener('mousedown', () => card.style.transform = 'scale(0.95)');
-        card.addEventListener('mouseup', () => card.style.transform = 'scale(1)');
-        card.addEventListener('mouseleave', () => card.style.transform = 'scale(1)');
-    });
-}
+    
