@@ -1,67 +1,42 @@
-import './core.js'; 
-
+// shell.js
 class SovereignShell {
-    constructor() { 
-        this.ghostCounter = 0;
-        this.init(); 
+    constructor() {
+        window.DREAM = this;
+        this.init();
     }
-    
-    async init() {
-        window.DREAM = this; // Menetapkan global object segera
-        
-        // Memastikan Ghost Trigger aktif kembali
-        const trigger = document.getElementById('ghost-header-trigger');
-        if(trigger) {
-            trigger.style.pointerEvents = 'auto'; 
-            trigger.onclick = () => this.handleGhostClick();
-        }
 
-        // Jalankan loader secara paksa jika terjadi error
-        try {
-            await this.load('home');
-        } catch (e) {
-            console.error("Critical Boot Error:", e);
-            this.forceReveal(); // Jalankan protokol darurat jika stuck
-        }
+    async init() {
+        // Force remove loader
+        const loader = document.getElementById('system-loader');
+        if(loader) loader.style.display = 'none';
+        
+        console.log("Kernel Booting...");
+        await this.load('home');
     }
 
     async load(key) {
         const vp = document.getElementById('root-viewport');
-        const loader = document.getElementById('system-loader');
         const nav = document.getElementById('main-nav');
-
+        
         try {
-            const { default: render } = await import(`./modules/${key}/index.js?v=${Date.now()}`);
-            vp.innerHTML = '';
-            await render({ container: vp, role: 'admin' });
+            // Gunakan path relatif yang sangat jelas
+            const modulePath = `./modules/${key}/index.js?v=${Date.now()}`;
+            const module = await import(modulePath);
             
-            // Tutup loader & tampilkan navigasi
-            if(loader) loader.style.opacity = '0';
-            setTimeout(() => { 
-                if(loader) loader.style.display = 'none';
-                if(nav) nav.style.display = 'flex';
-            }, 500);
-
+            vp.innerHTML = '';
+            await module.default({ container: vp });
+            
+            if(nav) nav.style.display = 'flex';
         } catch (err) {
-            this.forceReveal();
-            throw err;
-        }
-    }
-
-    forceReveal() {
-        document.getElementById('system-loader').style.display = 'none';
-        document.getElementById('main-nav').style.display = 'flex';
-        document.getElementById('root-viewport').innerHTML = '<p style="color:white; text-align:center; padding-top:50px;">Bismillah, System Restored via Emergency Protocol.</p>';
-    }
-
-    handleGhostClick() {
-        this.ghostCounter++;
-        if(navigator.vibrate) navigator.vibrate(50);
-        if(this.ghostCounter >= 5) {
-            this.ghostCounter = 0;
-            this.load('ghost'); 
+            console.error("Critical Load Error:", err);
+            vp.innerHTML = `<div style="color:white; padding:20px; font-family:monospace;">
+                <p>⚠️ Bismillah, Error Detected</p>
+                <p style="font-size:10px; color:red;">${err.message}</p>
+                <p style="font-size:10px;">Check: modules/${key}/index.js</p>
+            </div>`;
         }
     }
 }
 
+// Jalankan sistem
 new SovereignShell();
