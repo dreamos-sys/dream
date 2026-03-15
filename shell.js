@@ -1,13 +1,13 @@
 /**
  * ════════════════════════════════════════════
- * SHELL.JS - DREAM OS v2.1 COMPLETE
- * All Modules + Islamic Header + 7 Slides + Ghost
+ * SHELL.JS - DREAM OS v2.1 COMPLETE FIX
+ * Ghost Mode Fixed + All 19 Icons Visible
  * ════════════════════════════════════════════ */
 
 'use strict';
 
 // ════════════════════════════════════════════
-// 19 MODULES COMPLETE LIST
+// 19 MODULES COMPLETE (ALL ICONS DEFINED)
 // ════════════════════════════════════════════
 
 const MODULES = {
@@ -44,59 +44,18 @@ const MODULES = {
 };
 
 // ════════════════════════════════════════════
-// 7 SLIDE ANNOUNCEMENTS (7 DETIK EACH)
+// 7 SLIDE ANNOUNCEMENTS
 // ════════════════════════════════════════════
 
-const ANNOUNCEMENTS = [    {
-        id: 1,
-        title: '📢 Pengumuman Admin',
-        content: '*Jum\'at 6 Maret 2026* Sanlat hari ke-2 SMP Siswa masuk: 10.30 Guru masuk: 09.30 Siswa pulang: 21.00 Guru pulang: 21.15',
-        icon: '📢',
-        color: '#10b981'
-    },
-    {
-        id: 2,
-        title: '🔒 Security Update',
-        content: 'Sistem keamanan telah ditingkatkan. Ghost Mode sekarang dengan proteksi biometrik.',
-        icon: '🔒',
-        color: '#3b82f6'
-    },
-    {
-        id: 3,
-        title: '📊 Booking System',
-        content: 'Sistem booking ruangan sekarang anti-double booking. Cek ketersediaan real-time.',
-        icon: '📊',
-        color: '#8b5cf6'
-    },
-    {
-        id: 4,
-        title: '⚠️ K3 Alert',
-        content: 'Laporan kerusakan fasilitas akan otomatis diteruskan ke tim Maintenance.',
-        icon: '⚠️',
-        color: '#f59e0b'
-    },
-    {
-        id: 5,
-        title: '🧹 Janitor Schedule',
-        content: 'Jadwal kebersihan minggu ini telah diupdate. Cek modul Janitor Indoor/Outdoor.',
-        icon: '🧹',
-        color: '#22c55e'
-    },
-    {
-        id: 6,
-        title: '📦 Inventory Update',
-        content: 'Stok barang menipis akan otomatis mengirim notifikasi ke Admin.',
-        icon: '📦',
-        color: '#ef4444'
-    },
-    {
-        id: 7,
-        title: '🎉 Dream OS v2.1',
-        content: 'Terima kasih telah menggunakan Dream OS. Built with 💚 Bi idznillah - Dream Team 2026',
-        icon: '🎉',
-        color: '#10b981'
-    }
+const ANNOUNCEMENTS = [    { id: 1, title: '📢 Pengumuman Admin', content: '*Jum\'at 6 Maret 2026* Sanlat hari ke-2 SMP Siswa masuk: 10.30 Guru masuk: 09.30 Siswa pulang: 21.00 Guru pulang: 21.15', icon: '📢', color: '#10b981' },
+    { id: 2, title: '🔒 Security Update', content: 'Sistem keamanan telah ditingkatkan. Ghost Mode sekarang dengan proteksi biometrik.', icon: '🔒', color: '#3b82f6' },
+    { id: 3, title: '📊 Booking System', content: 'Sistem booking ruangan sekarang anti-double booking. Cek ketersediaan real-time.', icon: '📊', color: '#8b5cf6' },
+    { id: 4, title: '⚠️ K3 Alert', content: 'Laporan kerusakan fasilitas akan otomatis diteruskan ke tim Maintenance.', icon: '⚠️', color: '#f59e0b' },
+    { id: 5, title: '🧹 Janitor Schedule', content: 'Jadwal kebersihan minggu ini telah diupdate. Cek modul Janitor Indoor/Outdoor.', icon: '🧹', color: '#22c55e' },
+    { id: 6, title: '📦 Inventory Update', content: 'Stok barang menipis akan otomatis mengirim notifikasi ke Admin.', icon: '📦', color: '#ef4444' },
+    { id: 7, title: '🎉 Dream OS v2.1', content: 'Terima kasih telah menggunakan Dream OS. Built with 💚 Bi idznillah - Dream Team 2026', icon: '🎉', color: '#10b981' }
 ];
+
 // ════════════════════════════════════════════
 // GLOBAL STATE
 // ════════════════════════════════════════════
@@ -104,6 +63,8 @@ const ANNOUNCEMENTS = [    {
 let currentModule = 'home';
 let currentSlide = 0;
 let slideInterval = null;
+let ghostTaps = 0;
+let ghostTimeout = null;
 
 // ════════════════════════════════════════════
 // RENDER HOME DASHBOARD
@@ -121,7 +82,7 @@ function renderHome() {
     return `
         <div class="module-container active" id="module-home">
             <!-- Islamic Header -->
-            <header class="glass-header" id="ghost-trigger-zone" style="cursor:default;">
+            <header class="glass-header" id="ghost-trigger-zone" style="cursor:pointer;">
                 <div class="status-bar">
                     <span>📍 DEPOK CORE | <span id="clock">--:--</span></span>
                     <span>ISO 27001-55001 ✅</span>
@@ -135,25 +96,24 @@ function renderHome() {
                     ${navigator.platform || 'Device'} | ${navigator.onLine ? 'Online' : 'Offline'}
                 </div>
             </header>
-
             <!-- Main Content -->
             <main style="padding:16px;padding-bottom:140px;">
-                <!-- Announcement Slider (7 Slides) -->
+                <!-- Announcement Slider -->
                 <div class="glass-card" style="margin-bottom:16px;overflow:hidden;position:relative;">
-                    <div id="slide-container" style="transition:transform 0.5s ease;">
+                    <div id="slide-container">
                         ${ANNOUNCEMENTS.map((slide, index) => `
                             <div class="slide" data-slide="${index}" style="padding:20px;text-align:center;${index === 0 ? '' : 'display:none;'}">
                                 <div style="font-size:3rem;margin-bottom:12px;">${slide.icon}</div>
                                 <h3 style="color:${slide.color};font-size:1.1rem;margin-bottom:8px;">${slide.title}</h3>
-                                <p style="color:var(--text-muted);font-size:0.875rem;line-height:1.6;">${slide.content}</p>                            </div>
+                                <p style="color:var(--text-muted);font-size:0.875rem;line-height:1.6;">${slide.content}</p>
+                            </div>
                         `).join('')}
                     </div>
                     <!-- Slide Indicators -->
                     <div style="display:flex;justify-content:center;gap:8px;margin-top:16px;">
                         ${ANNOUNCEMENTS.map((_, index) => `
-                            <button class="slide-indicator ${index === 0 ? 'active' : ''}" 
-                                    onclick="goToSlide(${index})"
-                                    style="width:10px;height:10px;border-radius:50%;border:none;background:var(--text-subtle);cursor:pointer;transition:all 0.3s;">
+                            <button class="slide-indicator" onclick="goToSlide(${index})"
+                                    style="width:10px;height:10px;border-radius:50%;border:none;background:${index === 0 ? 'var(--color-primary)' : 'var(--text-subtle)'};cursor:pointer;transition:all 0.3s;">
                             </button>
                         `).join('')}
                     </div>
@@ -185,19 +145,19 @@ function renderHome() {
                         <div class="stat-value" style="color:var(--color-secondary);">24</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-label">Pending</div>
-                        <div class="stat-value" style="color:#f59e0b;">3</div>
+                        <div class="stat-label">Pending</div>                        <div class="stat-value" style="color:#f59e0b;">3</div>
                     </div>
                 </div>
 
-                <!-- All 19 Modules by Category -->
+                <!-- All 19 Modules -->
                 ${Object.entries(categories).map(([cat, data]) => `
                     <div class="category-section">
                         <h4 class="category-title">${data.label}</h4>
-                        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;">                            ${data.modules.map(key => MODULES[key] ? `
+                        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;">
+                            ${data.modules.map(key => MODULES[key] ? `
                                 <div class="glass-card" onclick="loadModule('${key}')" style="cursor:pointer;">
                                     <div class="module-icon" style="width:70px;height:70px;background:${MODULES[key].color};border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 8px 20px rgba(0,0,0,0.3);">
-                                        <i class="fas ${MODULES[key].icon}" style="color:white;font-size:2rem;"></i>
+                                        <i class="fas ${MODULES[key].icon}" style="color:#ffffff;font-size:2rem;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));"></i>
                                     </div>
                                     <div style="font-size:13px;font-weight:700;color:var(--text-primary);text-align:center;">${MODULES[key].label}</div>
                                     <div style="font-size:10px;color:var(--text-muted);text-align:center;">${MODULES[key].subtitle}</div>
@@ -230,36 +190,87 @@ function renderHome() {
 }
 
 // ════════════════════════════════════════════
-// SLIDER FUNCTIONS (7 SLIDES, 7 DETIK)
+// SLIDER FUNCTIONS
 // ════════════════════════════════════════════
 
 function startSlideShow() {
-    // Clear existing interval
-    if (slideInterval) clearInterval(slideInterval);
-    
-    // Start new interval (7 seconds)
-    slideInterval = setInterval(() => {
+    if (slideInterval) clearInterval(slideInterval);    slideInterval = setInterval(() => {
         currentSlide = (currentSlide + 1) % ANNOUNCEMENTS.length;
         goToSlide(currentSlide);
-    }, 7000); // 7 detik
-    
-    console.log('📢 [SLIDES] Started:', ANNOUNCEMENTS.length, 'slides');}
+    }, 7000);
+    console.log('📢 [SLIDES] Started:', ANNOUNCEMENTS.length, 'slides @ 7 detik');
+}
 
 function goToSlide(index) {
     currentSlide = index;
-    
-    // Hide all slides
     document.querySelectorAll('.slide').forEach((slide, i) => {
         slide.style.display = i === index ? 'block' : 'none';
     });
-    
-    // Update indicators
     document.querySelectorAll('.slide-indicator').forEach((ind, i) => {
-        ind.classList.toggle('active', i === index);
         ind.style.background = i === index ? 'var(--color-primary)' : 'var(--text-subtle)';
     });
+}
+
+// ════════════════════════════════════════════
+// GHOST MODE - FIXED! (GLOBAL FUNCTION)
+// ════════════════════════════════════════════
+
+function setupGhostTrigger() {
+    console.log('👻 [GHOST] Setting up trigger...');
     
-    console.log('📢 [SLIDES] Slide', index + 1, '/', ANNOUNCEMENTS.length);
+    const zone = document.getElementById('ghost-trigger-zone');
+    if (!zone) {
+        console.warn('⚠️ [GHOST] Trigger zone not found!');
+        return;
+    }
+    
+    // Remove old listener by cloning
+    const newZone = zone.cloneNode(true);
+    zone.parentNode.replaceChild(newZone, zone);
+    
+    // Add new listener
+    newZone.addEventListener('click', (e) => {
+        ghostTaps++;
+        console.log('👻 [GHOST] Tap', ghostTaps + '/5');
+        
+        // Haptic
+        if ('vibrate' in navigator) navigator.vibrate(30);
+        
+        // Visual feedback
+        e.target.style.opacity = '0.7';
+        setTimeout(() => e.target.style.opacity = '1', 100);
+        
+        if (ghostTimeout) clearTimeout(ghostTimeout);
+        
+        if (ghostTaps === 5) {
+            ghostTaps = 0;            console.log('✅ [GHOST] 5 taps detected!');
+            
+            setTimeout(() => {
+                const code = prompt('🔑 GHOST ACCESS CODE:\n(Password: dreamos2026)');
+                
+                if (code === 'dreamos2026') {
+                    if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
+                    toast('👻 Ghost Mode Activated!', 'success');
+                    
+                    // Load ghost module
+                    setTimeout(() => {
+                        loadModule('ghost');
+                    }, 500);
+                } else if (code !== null) {
+                    toast('❌ Access Denied', 'error');
+                    if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+                }
+            }, 200);
+            return;
+        }
+        
+        ghostTimeout = setTimeout(() => {
+            console.log('👻 [GHOST] Reset tap counter');
+            ghostTaps = 0;
+        }, 2000);
+    });
+    
+    console.log('✅ [GHOST] Trigger setup complete');
 }
 
 // ════════════════════════════════════════════
@@ -281,8 +292,7 @@ function renderBooking() {
                 </div>
             </div>
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-label">Total Rooms</div><div class="stat-value" style="color:var(--color-primary);">4</div></div>
-                <div class="stat-card"><div class="stat-label">Today</div><div class="stat-value" style="color:var(--color-secondary);">2</div></div>
+                <div class="stat-card"><div class="stat-label">Total Rooms</div><div class="stat-value" style="color:var(--color-primary);">4</div></div>                <div class="stat-card"><div class="stat-label">Today</div><div class="stat-value" style="color:var(--color-secondary);">2</div></div>
                 <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value" style="color:#f59e0b;">1</div></div>
             </div>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
@@ -292,7 +302,8 @@ function renderBooking() {
                         <div style="background:rgba(16,185,129,0.15);color:var(--color-primary);padding:4px 10px;border-radius:8px;font-size:10px;">20 ppl</div>
                     </div>
                     <button class="btn-primary" onclick="toast('Booking feature coming soon!', 'info')">Book Now</button>
-                </div>            </div>
+                </div>
+            </div>
             <button class="btn-back" onclick="loadModule('home')">← Back to Home</button>
         </div>
     `;
@@ -317,7 +328,7 @@ function renderSettings() {
                 <h2 style="color:var(--text-primary);font-size:1.1rem;margin-bottom:16px;">🎨 Theme</h2>
                 <div class="theme-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
                     ${themes.map(t => `
-                        <div class="theme-card ${window.ThemeManager?.getCurrent() === t.id ? 'active' : ''}" onclick="changeTheme('${t.id}')" style="background:var(--bg-secondary);border:2px solid ${window.ThemeManager?.getCurrent() === t.id ? 'var(--color-primary)' : 'transparent'};border-radius:var(--radius-lg);padding:16px;cursor:pointer;">
+                        <div class="theme-card" onclick="changeTheme('${t.id}')" style="background:var(--bg-secondary);border:2px solid ${window.ThemeManager?.getCurrent() === t.id ? 'var(--color-primary)' : 'transparent'};border-radius:var(--radius-lg);padding:16px;cursor:pointer;">
                             <div class="theme-preview" style="width:100%;height:80px;border-radius:var(--radius-md);margin-bottom:12px;background:linear-gradient(135deg,${t.colors['--bg-primary']},${t.colors['--bg-secondary']});"></div>
                             <div style="color:var(--text-primary);font-size:12px;text-align:center;">${t.name}</div>
                         </div>
@@ -330,18 +341,18 @@ function renderSettings() {
     `;
 }
 
-function renderGenericModule(key) {
-    const mod = MODULES[key];
+function renderGenericModule(key) {    const mod = MODULES[key];
     if (!mod) return renderHome();
     
     return `
         <div class="module-container active" id="module-${key}">
             <div style="text-align:center;padding:60px 20px;">
                 <div style="width:80px;height:80px;background:linear-gradient(135deg,${mod.color},var(--color-secondary));border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 8px 20px ${mod.color}66;">
-                    <i class="fas ${mod.icon}" style="color:white;font-size:2.5rem;"></i>
+                    <i class="fas ${mod.icon}" style="color:#ffffff;font-size:2.5rem;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));"></i>
                 </div>
                 <h2 style="color:var(--text-primary);font-size:1.5rem;margin-bottom:10px;">${mod.label}</h2>
-                <p style="color:var(--text-muted);">${mod.subtitle} - Coming Soon</p>            </div>
+                <p style="color:var(--text-muted);">${mod.subtitle} - Coming Soon</p>
+            </div>
             <button class="btn-back" onclick="loadModule('home')">← Back to Home</button>
         </div>
     `;
@@ -360,11 +371,11 @@ function loadModule(moduleName) {
         if (slideInterval) clearInterval(slideInterval);
     }
 
-    // Clear all modules
+    // Clear modules
     document.querySelectorAll('.module-container').forEach(m => m.remove());
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
-    // Render module
+    // Render
     let content = '';
     switch(moduleName) {
         case 'home': content = renderHome(); break;
@@ -380,7 +391,6 @@ function loadModule(moduleName) {
     // Update nav
     const navItem = document.querySelector(`[data-nav="${moduleName}"]`);
     if (navItem) navItem.classList.add('active');
-
     // Haptic
     if ('vibrate' in navigator) navigator.vibrate(30);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -389,12 +399,11 @@ function loadModule(moduleName) {
     if (moduleName === 'home') {
         setTimeout(() => {
             startSlideShow();
-            setupGhostTrigger();
-        }, 500);    }
+            setupGhostTrigger(); // RE-ATTACH GHOST TRIGGER!
+        }, 500);
+    }
 
-    // Update clock
     updateClock();
-    
     console.log('📦 [MODULE] Loaded:', moduleName);
 }
 
@@ -424,62 +433,13 @@ function clearCache() {
 }
 
 // ════════════════════════════════════════════
-// GHOST TRIGGER (INTEGRATED)
-// ════════════════════════════════════════════
-
-function setupGhostTrigger() {
-    let taps = 0;
-    let timeout;
-    const zone = document.getElementById('ghost-trigger-zone');
-    
-    if (!zone) {
-        console.warn('⚠️ [GHOST] Trigger zone not found!');
-        return;
-    }
-
-    // Remove old listeners
-    const newZone = zone.cloneNode(true);
-    zone.parentNode.replaceChild(newZone, zone);    
-    newZone.addEventListener('click', () => {
-        taps++;
-        console.log('👻 [GHOST] Tap', taps + '/5');
-        
-        if ('vibrate' in navigator) navigator.vibrate(30);
-        
-        if (timeout) clearTimeout(timeout);
-
-        if (taps === 5) {
-            taps = 0;
-            setTimeout(() => {
-                const code = prompt('🔑 GHOST ACCESS CODE:');
-                if (code === 'dreamos2026') {
-                    if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
-                    toast('👻 Ghost Mode Activated!', 'success');
-                    setTimeout(() => {
-                        loadModule('ghost');
-                    }, 500);
-                } else if (code !== null) {
-                    toast('❌ Access Denied', 'error');
-                }
-            }, 200);
-            return;
-        }
-        
-        timeout = setTimeout(() => { taps = 0; }, 2000);
-    });
-    
-    console.log('✅ [GHOST] Trigger setup complete');
-}
-
-// ════════════════════════════════════════════
 // CLOCK
 // ════════════════════════════════════════════
 
 function updateClock() {
     const clock = document.getElementById('clock');
     if (clock) {
-        const now = new Date();
-        clock.textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        const now = new Date();        clock.textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
     }
 }
 
@@ -488,7 +448,8 @@ function updateClock() {
 // ════════════════════════════════════════════
 
 function toast(msg, type = 'success') {
-    const icons = { success:'✅', error:'❌', warning:'⚠️', info:'ℹ️' };    const el = document.createElement('div');
+    const icons = { success:'✅', error:'❌', warning:'⚠️', info:'ℹ️' };
+    const el = document.createElement('div');
     el.className = `toast toast-${type}`;
     el.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
     const container = document.getElementById('toast-container');
@@ -505,33 +466,26 @@ function toast(msg, type = 'success') {
 
 function init() {
     console.log('🚀 [DREAM OS] v2.1 Initializing...');
-
-    // Init Theme
     window.ThemeManager?.init();
-
-    // Render Home
     loadModule('home');
-
-    // Hide Loading
+    
     setTimeout(() => {
         const loading = document.getElementById('loading-screen');
         if (loading) loading.classList.add('hide');
         console.log('✅ [LOADING] Screen hidden');
     }, 1500);
-
-    // Clock
+    
     updateClock();
     setInterval(updateClock, 1000);
-
+    
     console.log('✅ [DREAM OS] Ready!');
     console.log('📦 19 Modules Loaded');
-    console.log('📢 7 Slides (7 detik each)');
-    console.log('👻 Ghost Mode Ready');
+    console.log('📢 7 Slides @ 7 detik');
+    console.log('👻 Ghost Mode Ready (5-tap header)');
 }
 
 // Run
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
-    init();
-}
+    init();}
