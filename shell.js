@@ -1,42 +1,35 @@
-// shell.js
-class SovereignShell {
+class DreamShell {
     constructor() {
+        this.basePath = window.location.origin + window.location.pathname.split('index.html')[0];
         window.DREAM = this;
         this.init();
     }
 
     async init() {
-        // Force remove loader
-        const loader = document.getElementById('system-loader');
-        if(loader) loader.style.display = 'none';
-        
-        console.log("Kernel Booting...");
+        console.log("Bismillah, Dream OS v2.1 Active.");
         await this.load('home');
     }
 
     async load(key) {
         const vp = document.getElementById('root-viewport');
-        const nav = document.getElementById('main-nav');
-        
         try {
-            // Gunakan path relatif yang sangat jelas
-            const modulePath = `./modules/${key}/index.js?v=${Date.now()}`;
+            const modulePath = `${this.basePath}modules/${key}/index.js?v=${Date.now()}`;
             const module = await import(modulePath);
-            
             vp.innerHTML = '';
             await module.default({ container: vp });
             
-            if(nav) nav.style.display = 'flex';
+            // Set Active Nav Style
+            this.updateNavUI(key);
         } catch (err) {
-            console.error("Critical Load Error:", err);
-            vp.innerHTML = `<div style="color:white; padding:20px; font-family:monospace;">
-                <p>⚠️ Bismillah, Error Detected</p>
-                <p style="font-size:10px; color:red;">${err.message}</p>
-                <p style="font-size:10px;">Check: modules/${key}/index.js</p>
+            vp.innerHTML = `<div style="padding:40px; text-align:center; color:#ef4444;">
+                <i class="fa-solid fa-circle-exclamation" style="font-size:40px;"></i><br><br>
+                ⚠️ Bismillah, Error Loading: ${key}<br><small>${err.message}</small>
             </div>`;
         }
     }
-}
 
-// Jalankan sistem
-new SovereignShell();
+    updateNavUI(key) {
+        // Logika untuk merubah warna icon saat aktif
+    }
+}
+new DreamShell();
