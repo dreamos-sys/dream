@@ -635,3 +635,109 @@ body {
 /* ════════════════════════════════════════════
    END OF ADDITIONAL STYLES
    ════════════════════════════════════════════ */
+/* ════════════════════════════════════════════
+   TEXT VISIBILITY FIX - CRITICAL UPDATE
+   Add this at the VERY END of core/engine.css
+   ════════════════════════════════════════════ */
+
+/* Force darker glass backgrounds for text visibility */
+.glass-card,
+.glass-header,
+.bottom-nav,
+#toast-container .toast {
+    background: rgba(15, 23, 42, 0.95) !important;
+}
+
+/* ALL text elements - explicit colors with fallbacks */
+h1, h2, h3, h4, h5, h6 {
+    color: #e2e8f0 !important;
+}
+
+p, span, label, li {
+    color: #94a3b8 !important;
+}
+
+input, textarea, select {
+    color: #e2e8f0 !important;
+    background: rgba(15, 23, 42, 0.8) !important;
+    border: 1px solid rgba(51, 65, 85, 0.5) !important;
+}
+
+input::placeholder, textarea::placeholder {
+    color: #64748b !important;
+}
+
+button, .btn-primary, .btn-back {
+    color: white !important;
+}
+
+.stat-value {
+    color: #e2e8f0 !important;
+}
+
+.stat-label {
+    color: #94a3b8 !important;
+}
+
+.category-title {
+    color: #94a3b8 !important;
+}
+
+.nav-item {
+    color: #94a3b8 !important;}
+
+.nav-item.active {
+    color: #10b981 !important;
+}
+
+.bismillah {
+    color: #10b981 !important;
+}
+
+.shalawat {
+    color: #34d399 !important;
+}
+
+.status-bar {
+    color: #10b981 !important;
+}
+
+/* Module specific fixes */
+#ai-chat p {
+    color: #e2e8f0 !important;
+}
+
+#ai-input {
+    color: #e2e8f0 !important;
+}
+
+/* Booking module fixes */
+#booking-form label,
+#booking-form input,
+#booking-form textarea,
+#booking-form select {
+    color: #e2e8f0 !important;
+}
+
+/* Janitor module fixes */
+.checkbox-grid label {
+    color: #e2e8f0 !important;
+}
+
+/* Command Center fixes */
+#cmd-viewport {
+    color: #e2e8f0 !important;
+}
+
+#cmd-viewport h3,
+#cmd-viewport h4 {
+    color: #e2e8f0 !important;
+}
+#cmd-viewport p {
+    color: #94a3b8 !important;
+}
+
+/* Ensure all glass cards are dark enough */
+.glass-card:hover {
+    background: rgba(15, 23, 42, 0.95) !important;
+}
