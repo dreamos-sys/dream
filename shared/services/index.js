@@ -14,3 +14,21 @@ export async function initServices() {
   console.log('[Services] Initialized');
   // Bisa tambah inisialisasi lain (misal cek session)
 }
+export const services = {
+  toast: (msg, type = 'info') => {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = msg;
+    const container = document.getElementById('toast-container');
+    if (container) {
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    } else {
+      alert(msg);
+    }
+  }
+};
+
+export async function initServices() {
+  console.log('✅ Shared services initialized');
+}
