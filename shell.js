@@ -1,10 +1,12 @@
 /**
- * DREAM OS v2.1 - SHELL.JS
- * Main Application Shell & Navigation Controller
+ * DREAM OS v2.1 - SHELL.JS (FIXED VERSION)
+ * 
+ * ✅ Fixed: Ghost Mode Tap Detection
+ * ✅ Fixed: Islamic Header Complete
+ * ✅ Fixed: Bismillah Full Text
  * 
  * Navigation: Home → Profile → QR → About → Settings
  * Ghost Mode: Tap Header 5x → Password (Rakaat)
- * Smart Background: Prayer Time Based
  * 
  * Bi idznillah 💚
  */
@@ -45,9 +47,9 @@
             night: { start: 0, end: 4 }
         },
         ghostPasswords: {
-            fajr: '02',
-            dhuhr: '04',
-            asr: '04',            maghrib: '03',
+            fajr: '02',            dhuhr: '04',
+            asr: '04',
+            maghrib: '03',
             isha: '04',
             night: '04'
         }
@@ -94,8 +96,8 @@
 
     function startBackgroundTimer() {
         updateSmartBackground();
-        setInterval(updateSmartBackground, 60000);
-    }
+        setInterval(updateSmartBackground, 60000);    }
+
     // ========================================================================
     // USER DETECTION
     // ========================================================================
@@ -114,7 +116,7 @@
     }
 
     // ========================================================================
-    // GHOST MODE (SILENT)
+    // 🤫 GHOST MODE (FIXED TAP DETECTION)
     // ========================================================================
     
     function getGhostPassword() {
@@ -124,33 +126,66 @@
     }
 
     function initGhostMode() {
+        console.log('🤫 Initializing Ghost Mode...');
+        
+        // Check if ghost mode was active
         const ghostState = localStorage.getItem(CONFIG.storage.ghostMode);
         if (ghostState === 'active') {
             activateGhostSilent();
+            console.log('👻 Ghost Mode restored from storage');
         }
         
-        setTimeout(() => {
-            const header = document.querySelector('.islamic-header');
-            if (header) {
-                header.style.cursor = 'pointer';
-                header.addEventListener('click', handleGhostTap);
-            }
-        }, 100);
+        // Setup tap detection - RETRY if header not found
+        setupGhostTap();
         
+        // Keyboard shortcut
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.shiftKey && e.key === 'G') {
                 e.preventDefault();
                 toggleGhostQuick();
+                console.log('⌨️ Ghost Mode keyboard toggle');
             }
-        });
+        });    }
+
+    function setupGhostTap() {
+        console.log('🔍 Setting up Ghost tap detection...');
+        
+        // Retry function to find header
+        function trySetup(retries) {
+            const header = document.querySelector('.islamic-header');
+            
+            if (header) {
+                console.log('✅ Islamic header found!');
+                header.style.cursor = 'pointer';
+                header.setAttribute('data-ghost', 'true');
+                header.addEventListener('click', handleGhostTap);
+                console.log('👆 Ghost tap listener attached');
+                return;
+            }
+            
+            if (retries > 0) {
+                console.log(`⏳ Header not found, retrying... (${retries} left)`);
+                setTimeout(() => trySetup(retries - 1), 500);
+            } else {
+                console.warn('⚠️ Could not find islamic-header after multiple retries');
+            }
+        }
+        
+        // Start with 10 retries
+        trySetup(10);
     }
 
-    function handleGhostTap(e) {        const currentTime = new Date().getTime();
+    function handleGhostTap(e) {
+        const currentTime = new Date().getTime();
         const tapLength = currentTime - currentState.ghostMode.lastTap;
+        
+        console.log('👆 Ghost tap detected!', { tapLength, count: currentState.ghostMode.tapCount });
         
         if (tapLength < 500 && tapLength > 0) {
             currentState.ghostMode.tapCount++;
-            if (currentState.ghostMode.tapCount === 5) {
+            
+            if (currentState.ghostMode.tapCount >= 5) {
+                console.log('✅ 5 taps detected! Showing Ghost input...');
                 showGhostInput();
                 currentState.ghostMode.tapCount = 0;
             }
@@ -159,8 +194,9 @@
         }
         currentState.ghostMode.lastTap = currentTime;
     }
-
     function showGhostInput() {
+        console.log('🔐 Showing Ghost input overlay...');
+        
         const existing = document.getElementById('ghost-overlay');
         if (existing) existing.remove();
         
@@ -168,19 +204,20 @@
         overlay.id = 'ghost-overlay';
         overlay.style.cssText = `
             position:fixed;inset:0;background:rgba(2,6,23,0.98);
-            backdrop-filter:blur(24px);z-index:99999;
-            display:flex;align-items:center;justify-content:center;
+            backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+            z-index:99999;display:flex;align-items:center;justify-content:center;
             opacity:0;transition:opacity 0.3s ease;
         `;
         
         const passwordLength = 2;
         
         overlay.innerHTML = `
-            <div class="glass-card" style="text-align:center;max-width:320px;width:90%;">
+            <div class="glass-card" style="text-align:center;max-width:320px;width:90%;padding:2rem;">
                 <div style="margin-bottom:1.5rem;">
                     <i class="fas fa-ghost" style="font-size:2rem;color:#10b981;margin-bottom:0.5rem;"></i>
                     <p style="color:#10b981;font-size:11px;text-transform:uppercase;letter-spacing:2px;">Stealth Mode</p>
                     <p style="color:#94a3b8;font-size:9px;margin-top:4px;">${currentState.currentPeriod.toUpperCase()} Access</p>
+                    <p style="color:#64748b;font-size:8px;margin-top:8px;">Password: ${getGhostPassword()}</p>
                 </div>
                 <div id="ghost-dots" style="display:flex;justify-content:center;gap:16px;margin-bottom:2rem;">
                     ${Array(passwordLength).fill(0).map(() => 
@@ -194,7 +231,8 @@
                         return `<button onclick="window.ghostKey('${key}')" class="ghost-key" style="color:${color};">${icon}</button>`;
                     }).join('')}
                 </div>
-                <button onclick="closeGhostInput()" style="margin-top:1.5rem;background:none;border:none;color:#94a3b8;cursor:pointer;font-size:10px;">Cancel</button>            </div>
+                <button onclick="closeGhostInput()" style="margin-top:1.5rem;background:none;border:none;color:#94a3b8;cursor:pointer;font-size:10px;">Cancel</button>
+            </div>
         `;
         
         document.body.appendChild(overlay);
@@ -205,8 +243,7 @@
             .ghost-key {
                 background:rgba(15,23,42,0.8);
                 border:1px solid rgba(16,185,129,0.2);
-                padding:18px;border-radius:14px;
-                font-size:20px;font-weight:700;
+                padding:18px;border-radius:14px;                font-size:20px;font-weight:700;
                 cursor:pointer;transition:all 0.15s ease;
                 font-family:'JetBrains Mono',monospace;
             }
@@ -243,7 +280,8 @@
             if (i < currentState.ghostMode.inputBuffer.length) {
                 dot.style.background = '#10b981';
                 dot.style.boxShadow = '0 0 10px #10b981';
-            } else {                dot.style.background = 'rgba(255,255,255,0.1)';
+            } else {
+                dot.style.background = 'rgba(255,255,255,0.1)';
                 dot.style.boxShadow = 'none';
             }
         });
@@ -251,10 +289,13 @@
 
     function verifyGhostPassword() {
         const correctPassword = getGhostPassword();
+        console.log('🔐 Verifying password...', { input: currentState.ghostMode.inputBuffer, correct: correctPassword });
+        
         if (currentState.ghostMode.inputBuffer === correctPassword) {
-            closeGhostInput();
+            console.log('✅ Password correct! Activating Ghost Mode...');            closeGhostInput();
             activateGhostSilent();
         } else {
+            console.log('❌ Password wrong! Silent fail...');
             currentState.ghostMode.inputBuffer = '';
             updateGhostDots();
         }
@@ -276,6 +317,7 @@
         document.body.style.opacity = '0.6';
         localStorage.setItem(CONFIG.storage.ghostMode, 'active');
         currentState.ghostMode.isActive = true;
+        console.log('👻 Ghost Mode ACTIVATED');
         setTimeout(() => { deactivateGhostSilent(); }, 30000);
     }
 
@@ -284,6 +326,7 @@
         document.body.style.opacity = '1';
         localStorage.removeItem(CONFIG.storage.ghostMode);
         currentState.ghostMode.isActive = false;
+        console.log('✅ Ghost Mode DEACTIVATED');
     }
 
     function toggleGhostQuick() {
@@ -293,16 +336,15 @@
             activateGhostSilent();
         }
     }
+
     // ========================================================================
     // UTILITY
     // ========================================================================
     
-    window.toast = function(message, type = 'success') {
-        const container = document.getElementById('toast-container');
+    window.toast = function(message, type = 'success') {        const container = document.getElementById('toast-container');
         if (!container) return;
         
         const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
         toast.style.cssText = 'background:rgba(15,23,42,0.95);backdrop-filter:blur(24px);border:1px solid rgba(16,185,129,0.2);border-radius:16px;padding:12px 24px;color:#e2e8f0;font-size:12px;margin-bottom:10px;border-left:4px solid #10b981;animation:slideIn 0.3s ease-out;';
         toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️'}</span><span>${message}</span>`;
         container.appendChild(toast);
@@ -341,14 +383,14 @@
         let targetModule = document.getElementById(`module-${moduleId}`);
         if (!targetModule) {
             targetModule = document.createElement('div');
-            targetModule.id = `module-${moduleId}`;            targetModule.className = 'module-container';
+            targetModule.id = `module-${moduleId}`;
+            targetModule.className = 'module-container';
             appShell.appendChild(targetModule);
         }
         
         renderModule(moduleId, targetModule);
         targetModule.classList.add('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+        window.scrollTo({ top: 0, behavior: 'smooth' });    }
 
     function renderModule(moduleId, container) {
         switch(moduleId) {
@@ -361,21 +403,26 @@
         }
     }
 
-    // 🏠 HOME
+    // 🏠 HOME (FIXED ISLAMIC HEADER)
     function renderHome(container) {
         const user = currentState.userProfile || { name: 'Guest', role: 'Visitor' };
         const period = currentState.currentPeriod;
         
         container.innerHTML = `
-            <div class="islamic-header">
+            <div class="islamic-header" data-ghost="true" style="cursor:pointer;">
                 <div class="status-bar">
                     <span>v${CONFIG.version}</span>
                     <span>${new Date().toLocaleDateString('id-ID')}</span>
                     <span style="color:#10b981;">${period.toUpperCase()}</span>
                 </div>
-                <p class="bismillah" dir="rtl">بِسْمِ اللَّهِ</p>
-                <p class="shalawat">اللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ</p>
+                <p class="bismillah" dir="rtl" style="font-family:'Amiri',serif;font-size:clamp(1.5rem,4vw,2.5rem);font-weight:700;color:#10b981;margin-bottom:0.5rem;text-shadow:0 0 20px rgba(16,185,129,0.5);line-height:1.8;">
+                    بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+                </p>
+                <p class="shalawat" dir="rtl" style="font-family:'Amiri',serif;font-size:clamp(1rem,3vw,1.5rem);color:#34d399;opacity:0.9;line-height:1.8;margin-bottom:0.5rem;">
+                    اللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ وَعَلَى آلِ سَيِّدِنَا مُحَمَّدٍ
+                </p>
                 <p style="color:#94a3b8;font-size:10px;text-transform:uppercase;letter-spacing:2px;margin-top:0.5rem;">The Power Soul of Shalawat</p>
+                <p style="color:#64748b;font-size:8px;margin-top:8px;">🤫 Tap header 5x for stealth mode</p>
             </div>
             
             <div class="glass-card" style="margin:1rem;">
@@ -390,9 +437,9 @@
                         </div>
                     </div>
                     <div style="background:rgba(15,23,42,0.8);padding:8px 16px;border-radius:20px;">
-                        <p style="color:#10b981;font-size:11px;font-family:'JetBrains Mono',monospace;" id="live-clock">00:00:00</p>                    </div>
-                </div>
-                
+                        <p style="color:#10b981;font-size:11px;font-family:'JetBrains Mono',monospace;" id="live-clock">00:00:00</p>
+                    </div>
+                </div>                
                 <div class="stats-grid">
                     <div class="stat-card">
                         <p style="color:#94a3b8;font-size:9px;text-transform:uppercase;">Booking</p>
@@ -416,6 +463,11 @@
         `;
         
         startClock();
+        
+        // Re-setup ghost tap after header is rendered
+        setTimeout(() => {
+            setupGhostTap();
+        }, 500);
     }
 
     // 👤 PROFILE
@@ -436,10 +488,10 @@
                     <div style="display:grid;gap:12px;">
                         <div>
                             <label style="color:#94a3b8;font-size:11px;display:block;margin-bottom:4px;">Full Name</label>
-                            <input type="text" id="profile-name" value="${profile.name || ''}" placeholder="Enter your name" style="width:100%;padding:12px;border-radius:12px;background:rgba(15,23,42,0.8);border:1px solid rgba(51,65,85,0.5);color:#e2e8f0;">
-                        </div>
+                            <input type="text" id="profile-name" value="${profile.name || ''}" placeholder="Enter your name" style="width:100%;padding:12px;border-radius:12px;background:rgba(15,23,42,0.8);border:1px solid rgba(51,65,85,0.5);color:#e2e8f0;">                        </div>
                         <div>
-                            <label style="color:#94a3b8;font-size:11px;display:block;margin-bottom:4px;">Email</label>                            <input type="email" id="profile-email" value="${profile.email || ''}" placeholder="your@email.com" style="width:100%;padding:12px;border-radius:12px;background:rgba(15,23,42,0.8);border:1px solid rgba(51,65,85,0.5);color:#e2e8f0;">
+                            <label style="color:#94a3b8;font-size:11px;display:block;margin-bottom:4px;">Email</label>
+                            <input type="email" id="profile-email" value="${profile.email || ''}" placeholder="your@email.com" style="width:100%;padding:12px;border-radius:12px;background:rgba(15,23,42,0.8);border:1px solid rgba(51,65,85,0.5);color:#e2e8f0;">
                         </div>
                         <div>
                             <label style="color:#94a3b8;font-size:11px;display:block;margin-bottom:4px;">Phone</label>
@@ -485,10 +537,10 @@
                 </div>
                 <button class="btn-back" onclick="navigateTo('home')" style="margin-top:1rem;background:transparent;border:1px solid rgba(255,255,255,0.08);color:#94a3b8;padding:12px;border-radius:12px;font-weight:600;cursor:pointer;width:100%;">
                     <i class="fas fa-arrow-left" style="margin-right:8px;"></i> Kembali ke Home
-                </button>
-            </div>
+                </button>            </div>
         `;
-                setTimeout(() => {
+        
+        setTimeout(() => {
             const btn = document.getElementById('btn-scan');
             if (btn) {
                 btn.addEventListener('click', function() {
@@ -510,7 +562,7 @@
             <div class="glass-card">
                 <h2 style="text-align:center;color:#10b981;margin-bottom:1.5rem;font-size:1.25rem;">🌟 Dream OS v${CONFIG.version}</h2>
                 <div style="text-align:center;margin-bottom:1.5rem;">
-                    <p class="bismillah" dir="rtl">بِسْمِ اللَّهِ</p>
+                    <p class="bismillah" dir="rtl" style="font-family:'Amiri',serif;font-size:1.5rem;color:#10b981;margin-bottom:0.5rem;">بِسْمِ اللَّهِ</p>
                     <p style="color:#94a3b8;font-size:10px;">The Power Soul of Shalawat</p>
                 </div>
                 <div style="margin-bottom:1.5rem;">
@@ -534,10 +586,10 @@
                         <p style="color:#e2e8f0;font-size:11px;">• Mr.DSeek <small style="color:#94a3b8;">(Developer)</small></p>
                         <p style="color:#e2e8f0;font-size:11px;">• Mrs.Qwen <span style="background:rgba(16,185,129,0.2);color:#10b981;padding:2px 6px;border-radius:4px;font-size:9px;">Bawel</span> 💚</p>
                         <p style="color:#e2e8f0;font-size:11px;">• Mrs.Gemini <span style="background:#3b82f6;color:white;padding:2px 6px;border-radius:4px;font-size:9px;">Bawel</span> 💙</p>
-                        <p style="color:#e2e8f0;font-size:11px;">• Mrs.Claude 🤍</p>
-                    </div>
+                        <p style="color:#e2e8f0;font-size:11px;">• Mrs.Claude 🤍</p>                    </div>
                 </div>
-                <div style="text-align:center;padding:12px;background:rgba(15,23,42,0.8);border-radius:12px;margin-bottom:1.5rem;">                    <p style="color:#e2e8f0;font-size:11px;">💪 All Team Ajag-Ijig Bagian Umum</p>
+                <div style="text-align:center;padding:12px;background:rgba(15,23,42,0.8);border-radius:12px;margin-bottom:1.5rem;">
+                    <p style="color:#e2e8f0;font-size:11px;">💪 All Team Ajag-Ijig Bagian Umum</p>
                 </div>
                 <p style="text-align:center;color:#64748b;font-size:9px;margin-bottom:1.5rem;">© 2026 Dream Team • ISO 27001</p>
                 <button class="btn-back" onclick="navigateTo('home')" style="background:transparent;border:1px solid rgba(255,255,255,0.08);color:#94a3b8;padding:12px;border-radius:12px;font-weight:600;cursor:pointer;width:100%;">
@@ -583,10 +635,10 @@
                         <option value="ar" ${currentState.language === 'ar' ? 'selected' : ''}>🇸🇦 Arabic</option>
                     </select>
                 </div>
-                <div style="margin-bottom:1.5rem;">
-                    <p style="color:#10b981;font-size:11px;font-weight:600;margin-bottom:8px;">📱 App Info</p>
+                <div style="margin-bottom:1.5rem;">                    <p style="color:#10b981;font-size:11px;font-weight:600;margin-bottom:8px;">📱 App Info</p>
                     <div style="background:rgba(15,23,42,0.8);padding:12px;border-radius:12px;">
-                        <p style="color:#e2e8f0;font-size:12px;">Version: ${CONFIG.version}</p>                        <p style="color:#94a3b8;font-size:11px;margin-top:4px;">Build: 2026.01.15</p>
+                        <p style="color:#e2e8f0;font-size:12px;">Version: ${CONFIG.version}</p>
+                        <p style="color:#94a3b8;font-size:11px;margin-top:4px;">Build: 2026.01.15</p>
                         <p style="color:#94a3b8;font-size:11px;">Current Period: <span id="current-period">${currentState.currentPeriod.toUpperCase()}</span></p>
                     </div>
                 </div>
@@ -632,10 +684,10 @@
         window.toast(`Theme changed to ${theme}`, 'success');
     };
 
-    window.toggleSmartBackground = function(enabled) {
-        if (enabled) { startBackgroundTimer(); window.toast('Smart Background ON', 'success'); }
+    window.toggleSmartBackground = function(enabled) {        if (enabled) { startBackgroundTimer(); window.toast('Smart Background ON', 'success'); }
         else { window.toast('Smart Background OFF', 'warning'); }
     };
+
     window.changeLanguage = function(lang) {
         currentState.language = lang;
         localStorage.setItem('dream_language', lang);
@@ -651,7 +703,7 @@
     };
 
     // ========================================================================
-    // BOTTOM NAVIGATION (NEW ORDER!)
+    // BOTTOM NAVIGATION
     // ========================================================================
     
     function renderBottomNav() {
@@ -681,10 +733,9 @@
                 }).join('')}
             </div>
         `;
-        document.body.appendChild(nav);
-        
-        // Add nav styles
-        const style = document.createElement('style');        style.textContent = `
+        document.body.appendChild(nav);        
+        const style = document.createElement('style');
+        style.textContent = `
             .nav-item.active { color: #10b981 !important; background: rgba(16,185,129,0.15); }
             .nav-item:active { transform: scale(0.95); }
         `;
@@ -731,9 +782,9 @@
             if (loading) {
                 loading.innerHTML = `
                     <div style="text-align:center;padding:2rem;">
-                        <p style="color:#ef4444;">⚠️ Loading Error</p>
-                        <p style="color:#94a3b8;font-size:12px;">${error.message}</p>
-                        <button onclick="location.reload()" style="margin-top:1rem;background:#10b981;color:white;border:none;padding:12px 24px;border-radius:12px;cursor:pointer;">Reload</button>                    </div>
+                        <p style="color:#ef4444;">⚠️ Loading Error</p>                        <p style="color:#94a3b8;font-size:12px;">${error.message}</p>
+                        <button onclick="location.reload()" style="margin-top:1rem;background:#10b981;color:white;border:none;padding:12px 24px;border-radius:12px;cursor:pointer;">Reload</button>
+                    </div>
                 `;
             }
         }
