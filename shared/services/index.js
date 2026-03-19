@@ -1,11 +1,13 @@
+import { config } from './config.js';
+
 export const services = {
     auth: {
-        login: (code) => {
-            // BYPASS MODE: ACCESS GRANTED FOR MASTER M
-            console.log('🔓 GHOST BYPASS ACTIVATED');
+        login: async (code) => {
+            console.log('🔓 GHOST BYPASS: ACCESS GRANTED BY MASTER M');
             localStorage.setItem('dream_os_session', 'active');
             localStorage.setItem('failedAttempts', '0');
-            return true; 
+            localStorage.setItem('last_access', new Date().toISOString());
+            return true;
         }
     },
     toast: (msg, type = 'info') => {
@@ -14,5 +16,5 @@ export const services = {
 };
 
 export async function initServices() {
-    console.log('🔓 SECURITY BYPASSED - WELCOME HOME MASTER');
+    console.log('🔓 Sovereign Services v' + config.version + ' Bypass Active');
 }
