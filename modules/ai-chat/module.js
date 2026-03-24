@@ -1,63 +1,56 @@
-export default {
-    async render() {
-        return `
-            <div class="p-6 animate-up flex flex-col h-full">
-                <h2 class="text-white font-black text-xl tracking-[4px] uppercase mb-6">AI Council</h2>
-                
-                <div class="flex gap-3 mb-8">
-                    <button onclick="window.setAgent('gemini')" id="btn-gemini" class="flex-1 glass p-4 rounded-2xl border-2 border-purple-500 text-purple-500 transition-all">
-                        <i class="fas fa-wand-magic-sparkles mb-1"></i><br><span class="text-[8px] font-black">GEMINI</span>
-                    </button>
-                    <button onclick="window.setAgent('claude')" id="btn-claude" class="flex-1 glass p-4 rounded-2xl border-2 border-transparent text-zinc-500 transition-all">
-                        <i class="fas fa-brain mb-1"></i><br><span class="text-[8px] font-black">CLAUDE</span>
-                    </button>
-                    <button onclick="window.setAgent('gpt')" id="btn-gpt" class="flex-1 glass p-4 rounded-2xl border-2 border-transparent text-zinc-500 transition-all">
-                        <i class="fas fa-bolt mb-1"></i><br><span class="text-[8px] font-black">GPT-4</span>
-                    </button>
-                </div>
+Alert('🤖 AI Speak Module Loaded');
 
-                <div id="ai-response-area" class="flex-1 glass rounded-[35px] p-6 overflow-y-auto mb-6 border-l-4 border-l-purple-500">
-                    <p class="text-zinc-500 text-xs italic">Menunggu instruksi Master M...</p>
-                </div>
+(function() {
+    const supabase = window.supabase;
+    const chatDisplay = document.getElementById('chat-display');
+    const chatInput = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-btn');
+    const voiceBtn = document.getElementById('voice-btn');
+    const voiceWave = document.getElementById('voice-wave');
 
-                <div class="relative">
-                    <input type="text" id="ai-input" placeholder="Tanya Agent..." class="w-full bg-zinc-900 border border-zinc-800 p-5 rounded-[25px] text-white text-xs outline-none focus:border-purple-500 pr-16">
-                    <button onclick="window.triggerAI()" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-purple-600 rounded-2xl flex items-center justify-center text-black">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
+    // Add message to chat
+    function addMessage(text, isUser = false) {
+        if(!chatDisplay) return;
+        const div = document.createElement('div');
+        div.className = `flex items-start gap-3 mb-4 ${isUser ? 'flex-row-reverse' : ''}`;
+        div.innerHTML = `
+            <div class="w-10 h-10 rounded-full ${isUser ? 'bg-blue-600' : 'bg-purple-600'} flex items-center justify-center text-xl shadow-lg border border-white/10">${isUser ? '👤' : '🤖'}</div>
+            <div class="${isUser ? 'bg-blue-600' : 'bg-slate-800'} p-4 rounded-2xl ${isUser ? 'rounded-tr-none' : 'rounded-tl-none'} max-w-[85%] shadow-xl border border-white/5">
+                <p class="text-[13px] leading-relaxed text-white">${text}</p>
+                <p class="text-[9px] opacity-40 mt-2 uppercase tracking-widest font-mono">${isUser ? 'User' : 'Dream AI'} • Now</p>
             </div>
         `;
-    },
-
-    afterRender() {
-        let currentAgent = 'gemini';
-
-        window.setAgent = (name) => {
-            currentAgent = name;
-            ['gemini', 'claude', 'gpt'].forEach(a => {
-                const btn = document.getElementById(`btn-${a}`);
-                btn.style.borderColor = (a === name) ? (a==='gemini'?'#8b5cf6':a==='claude'?'#f27352':'#10a37f') : 'transparent';
-                btn.style.color = (a === name) ? '#fff' : '#52525b';
-            });
-        };
-
-        window.triggerAI = async () => {
-            const input = document.getElementById('ai-input');
-            const area = document.getElementById('ai-response-area');
-            if(!input.value) return;
-
-            area.innerHTML = `<div class="animate-pulse text-zinc-600 text-xs">Menganalisa...</div>`;
-            const result = await DREAM.ask(input.value, currentAgent);
-            
-            area.innerHTML = `
-                <div class="flex items-center gap-2 mb-4">
-                    <i class="fas ${result.icon}" style="color:${result.color}"></i>
-                    <span class="text-[10px] font-black uppercase tracking-widest" style="color:${result.color}">${currentAgent}</span>
-                </div>
-                <p class="text-white text-xs leading-relaxed">${result.response}</p>
-            `;
-            input.value = '';
-        };
+        chatDisplay.appendChild(div);
+        chatDisplay.scrollTop = chatDisplay.scrollHeight;
     }
-};
+
+    async function getAIResponse(question) {
+        const q = question.toLowerCase();
+        try {
+            if (q.includes('booking')) {
+                const { count } = await supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+                return `📅 Status: Ada **${count || 0} booking** yang masih pending di sistem SIF Al-Fikri.`;
+            }
+            if (q.includes('k3')) {
+                const { count } = await supabase.from('k3_reports').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+                return `⚠️ Laporan: Terdeteksi **${count || 0} temuan K3** baru yang butuh verifikasi.`;
+            }
+            if (q.includes('hanung')) {
+                return `✍️ Bapak **Hanung Budianto, S.E.** bertindak sebagai Final Approver di sistem ini.`;
+            }
+        } catch (e) { return "❌ Error: Gagal koneksi ke Core Supabase."; }
+        return `🤖 Siap Master M! Apa lagi yang bisa saya bantu terkait operasional sistem?`;
+    }
+
+    async function sendMessage() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+        addMessage(text, true);
+        chatInput.value = '';
+        const response = await getAIResponse(text);
+        addMessage(response);
+    }
+
+    sendBtn?.addEventListener('click', sendMessage);
+    chatInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+})();
