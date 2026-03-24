@@ -1,15 +1,13 @@
 /**
- * 🏛️ DREAM OS v2.1 - HARMONIZED KERNEL
- * Integrated: 7 Slides, ISO Standards, & Modular Navigation
+ * 🏛️ DREAM OS v2.1 - PEAR GREEN DYNAMIC SHELL
+ * Master M Architect Revision - Anti Bash Error
  */
 
 class DreamKernel {
     constructor() {
         this.state = {
             isAuth: sessionStorage.getItem('dream_auth_v2.1') === 'true',
-            masterKey: '012443410', 
-            idleSeconds: 0,
-            maxIdle: 120 
+            currentSlide: 0
         };
         this.slides = [
             { title: "🕌 Spiritual Core", content: "Bismillah bi idznillah.\nSistem beroperasi dengan keberkahan." },
@@ -20,26 +18,24 @@ class DreamKernel {
             { title: "🌤️ Weather", content: "Depok: Cerah Berawan\nSuhu: 32°C" },
             { title: "💡 Quote of Day", content: "'Keamanan adalah pondasi,\nSpiritualitas adalah atap.'" }
         ];
-        this.currentSlide = 0;
         this.init();
     }
 
     init() {
-        if (document.readyState === 'complete') { this.renderUI(); }
-        else { window.addEventListener('load', () => this.renderUI()); }
-        this.startSlider(); 
+        document.readyState === 'complete' ? this.renderUI() : window.addEventListener('load', () => this.renderUI());
+        this.startSlider();
     }
 
     startSlider() {
         setInterval(() => {
-            const slideEl = document.getElementById('smart-slide-content');
-            if (slideEl && this.state.isAuth) {
-                this.currentSlide = (this.currentSlide + 1) % this.slides.length;
-                const s = this.slides[this.currentSlide];
-                slideEl.style.opacity = 0;
+            const el = document.getElementById('slide-content');
+            if (el) {
+                this.state.currentSlide = (this.state.currentSlide + 1) % this.slides.length;
+                const s = this.slides[this.state.currentSlide];
+                el.style.opacity = 0;
                 setTimeout(() => {
-                    slideEl.innerHTML = `<h3 style="color:#10b981; margin:0 0 5px 0; font-size:14px;">${s.title}</h3><p style="color:#cbd5e1; font-size:11px; line-height:1.4; white-space:pre-line; margin:0;">${s.content}</p>`;
-                    slideEl.style.opacity = 1;
+                    el.innerHTML = `<h3 style="color:#a3e635; margin:0 0 5px 0; font-size:14px; text-shadow: 0 0 10px rgba(163,230,53,0.5);">${s.title}</h3><p style="color:#cbd5e1; font-size:11px; line-height:1.4; margin:0;">${s.content}</p>`;
+                    el.style.opacity = 1;
                 }, 300);
             }
         }, 7000);
@@ -50,33 +46,35 @@ class DreamKernel {
         if (!shell) return;
 
         shell.innerHTML = `
-            <header style="text-align:center; padding: 15px; background: rgba(16,185,129,0.05);">
-                <p style="font-family:serif; color:#10b981; font-size:18px; margin:0;">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
-                <p style="font-family:serif; color:#34d399; font-size:12px; margin:2px 0;">اللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ</p>
-                <small style="color:#475569; font-size:8px; letter-spacing:2px;">ISO 27001 | 9001 | 55001 COMPLIANT</small>
+            <style>
+                body { background: #020617; color: white; font-family: sans-serif; overflow-x: hidden; }
+                .pear-glow { box-shadow: 0 0 20px rgba(163, 230, 53, 0.15); border: 1px solid rgba(163, 230, 53, 0.2); }
+                .nav-active { color: #a3e635 !important; filter: drop-shadow(0 0 5px #a3e635); }
+            </style>
+
+            <header style="text-align:center; padding: 20px; background: radial-gradient(circle at top, rgba(163, 230, 53, 0.1), transparent);">
+                <p style="color:#a3e635; font-size:20px; margin:0; font-weight:bold;">بِسْمِ اللَّهِ بِإِذْنِ اللَّهِ</p>
+                <p style="color:#4d7c0f; font-size:12px; margin:5px 0; letter-spacing:1px;">اَللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ</p>
             </header>
 
-            <div style="margin: 10px 15px; background: rgba(30,41,59,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 15px; min-height: 80px; display:flex; align-items:center; justify-content:center; text-align:center;" id="smart-slide-container">
-                <div id="smart-slide-content" style="transition: opacity 0.3s;">
-                    <h3 style="color:#10b981; margin:0;">Bismillah bi idznillah</h3>
-                    <p style="color:#64748b; font-size:11px;">Initializing Smart Core...</p>
+            <div class="pear-glow" style="margin: 10px 15px; background: rgba(15,23,42,0.6); border-radius: 25px; padding: 20px; min-height: 90px; backdrop-filter: blur(10px); display:flex; align-items:center; justify-content:center; text-align:center;">
+                <div id="slide-content" style="transition: opacity 0.3s;">
+                    <h3 style="color:#a3e635; margin:0;">DREAM CORE v15.0</h3>
+                    <p style="color:#64748b; font-size:11px;">System Initializing...</p>
                 </div>
             </div>
 
             <div id="main-content" style="padding-bottom: 100px;"></div>
 
-            <nav style="position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 25px; display: flex; gap: 25px; backdrop-filter: blur(10px); z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-                <div onclick="window.DREAM.navigate('home')" style="cursor:pointer; display:flex; flex-direction:column; align-items:center; color:#10b981;">
-                    <i class="fas fa-brain" style="font-size: 18px;"></i>
-                    <span style="font-size:8px; font-weight:700; margin-top:3px;">HOME</span>
+            <nav style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(2,6,23,0.9); border: 1px solid rgba(163,230,53,0.2); padding: 12px 30px; border-radius: 35px; display: flex; gap: 35px; backdrop-filter: blur(15px); z-index: 1000;">
+                <div onclick="window.DREAM.navigate('home')" class="nav-active" style="cursor:pointer; text-align:center;">
+                    <i class="fas fa-home" style="font-size: 20px;"></i>
                 </div>
-                <div onclick="window.DREAM.navigate('profile')" style="cursor:pointer; display:flex; flex-direction:column; align-items:center; color:#64748b;">
-                    <i class="fas fa-user" style="font-size: 18px;"></i>
-                    <span style="font-size:8px; font-weight:700; margin-top:3px;">PROFILE</span>
+                <div onclick="window.DREAM.navigate('qr')" style="cursor:pointer; text-align:center; color:#475569;">
+                    <i class="fas fa-qrcode" style="font-size: 20px;"></i>
                 </div>
-                <div onclick="window.DREAM.navigate('qr')" style="cursor:pointer; display:flex; flex-direction:column; align-items:center; color:#64748b;">
-                    <i class="fas fa-qrcode" style="font-size: 18px;"></i>
-                    <span style="font-size:8px; font-weight:700; margin-top:3px;">QR SCAN</span>
+                <div onclick="window.DREAM.navigate('profile')" style="cursor:pointer; text-align:center; color:#475569;">
+                    <i class="fas fa-user" style="font-size: 20px;"></i>
                 </div>
             </nav>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -90,13 +88,11 @@ class DreamKernel {
         const content = document.getElementById('main-content');
         if (!content) return;
         try {
-            // Memanggil modul sesuai struktur folder yang ada di screenshot Anda
             const mod = await import(`./modules/${id}/module.js?v=${Date.now()}`);
             content.innerHTML = await mod.default.render();
             if (mod.default.afterRender) mod.default.afterRender();
-        } catch(e) { 
-            console.error(e);
-            content.innerHTML = `<div style="color:#ef4444; padding:40px; text-align:center;"><i class="fas fa-exclamation-triangle"></i><br>Module '${id}' failed to load.</div>`; 
+        } catch(e) {
+            content.innerHTML = `<div style="padding:40px; text-align:center; color:#ef4444;">Module '${id}' Not Found.</div>`;
         }
     }
 }
