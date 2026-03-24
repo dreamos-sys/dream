@@ -17,7 +17,7 @@ export const BrainHub = {
         
         const agent = this.agents[this.current];
         setTimeout(() => {
-            let res = `[${agent.name}]: Bismillah, instruksi diterima Master M.`;
+            let res = `[${agent.name}]: AIAgent.getResponse(val)`;
             if(val.toLowerCase().includes('sholawat')) res = `[${agent.name}]: Allahumma Sholli 'ala Sayyidina Muhammad. ✨`;
             window.addChat(this.current, res);
         }, 500);
