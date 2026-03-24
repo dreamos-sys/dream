@@ -1,47 +1,53 @@
-const KERNEL_CONFIG = {
-    key: "012443410",
-    version: "2.1.0",
-    owner: "Master M"
-};
+// DREAM OS v2.1 - KERNEL MODULE
+const MANTRA = "012443410";
 
-const UI = {
+class DreamKernel {
+    constructor() {
+        this.init();
+    }
+
     init() {
-        this.renderAuth();
-    },
-    renderAuth() {
-        document.getElementById('app').innerHTML = `
-            <div class="text-center">
-                <div class="w-24 h-24 bg-gradient-to-br from-green-500/20 to-emerald-900/40 rounded-[2.5rem] mx-auto mb-10 flex items-center justify-center border border-green-500/30 shadow-[0_0_50px_rgba(34,197,94,0.1)]">
-                    <i class="fas fa-microchip text-4xl text-green-500"></i>
+        document.getElementById('app-shell').innerHTML = `
+            <div id="auth-screen" class="h-screen flex items-center justify-center bg-black">
+                <div class="text-center p-10 glass rounded-[3rem] border border-white/5 shadow-2xl">
+                    <div class="w-20 h-20 bg-green-500 rounded-3xl mx-auto mb-8 flex items-center justify-center">
+                        <i class="fas fa-microchip text-3xl text-black"></i>
+                    </div>
+                    <h1 class="text-[10px] tracking-[10px] text-white/30 uppercase mb-10 font-black">AI CORE v2.1</h1>
+                    <div class="relative">
+                        <input type="password" id="pin" placeholder="MANTRA" class="bg-transparent border-b border-white/10 text-center tracking-[10px] outline-none w-48 pb-2 text-sm focus:border-green-500 transition-all uppercase">
+                        <i id="toggle" class="fas fa-eye absolute right-0 bottom-3 text-white/20 cursor-pointer"></i>
+                    </div>
                 </div>
-                <h1 class="text-[11px] tracking-[12px] text-white/40 uppercase mb-12 font-black">Dream OS v2.1</h1>
-                <input type="password" id="access" placeholder="MANTRA" class="bg-transparent border-b border-white/10 text-center tracking-[12px] outline-none w-44 pb-3 text-lg focus:border-green-500 transition-all placeholder:text-white/5 uppercase">
             </div>
         `;
-        document.getElementById('access').addEventListener('input', (e) => {
-            if(e.target.value === KERNEL_CONFIG.key) this.launchDash();
+        
+        // Logic Intip Mantra (Mata)
+        const pin = document.getElementById('pin');
+        document.getElementById('toggle').onclick = () => {
+            pin.type = pin.type === 'password' ? 'text' : 'password';
+        };
+
+        pin.addEventListener('input', (e) => {
+            if(e.target.value === MANTRA) this.boot();
         });
-    },
-    launchDash() {
-        const modules = [
-            {i: 'calendar-alt', l: 'Booking'}, {i: 'hand-holding-heart', l: 'K3'}, {i: 'user-shield', l: 'Security'},
-            {i: 'broom', l: 'Janitor'}, {i: 'tools', l: 'Tools'}, {i: 'cogs', l: 'Maintenance'},
-            {i: 'warehouse', l: 'Assets'}, {i: 'brain', l: 'AI Arena'}, {i: 'id-card-alt', l: 'Admin'}
-        ];
-        document.getElementById('app').innerHTML = `
-            <div class="grid grid-cols-3 gap-5 animate-in fade-in zoom-in duration-500">
-                ${modules.map(m => `
-                    <div class="grid-icon glass-card aspect-square flex flex-col items-center justify-center rounded-[1.8rem] cursor-pointer active-ring">
-                        <i class="fas fa-${m.i} text-2xl mb-3 text-white/80"></i>
-                        <span class="text-[9px] uppercase tracking-widest text-white/30 font-bold">${m.l}</span>
-                    </div>
-                `).join('')}
-            </div>
-            <div class="mt-16 text-center">
-                <p class="text-[8px] text-white/10 tracking-[6px] font-black uppercase mb-2 italic">Out of The Box Inside</p>
-                <p class="text-[7px] text-green-500/30 uppercase tracking-[2px]">Dream Team Family System</p>
+    }
+
+    boot() {
+        document.getElementById('app-shell').innerHTML = `
+            <div class="p-6 animate-fade-in text-center">
+                <p class="text-green-500 text-lg mb-2 font-serif italic">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</p>
+                <div class="grid grid-cols-3 gap-4 mt-10">
+                    ${['Booking','K3','Security','Janitor','Tools','Maintenance','Assets','Arena','Admin'].map(m => `
+                        <div class="aspect-square bg-white/5 border border-white/10 rounded-2xl flex flex-col items-center justify-center">
+                            <i class="fas fa-cube mb-2 opacity-50"></i>
+                            <span class="text-[8px] uppercase font-bold opacity-30">${m}</span>
+                        </div>
+                    `).join('')}
+                </div>
             </div>
         `;
     }
-};
-window.onload = () => UI.init();
+}
+
+new DreamKernel();
