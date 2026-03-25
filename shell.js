@@ -1,120 +1,82 @@
 /**
- * ══════════════════════════════════════════════════════════════
- * DREAM OS v2.3.6 - SOVEREIGN COMMAND CENTER KERNEL
- * Fix: Empty UI & Module Router Integration
- * ══════════════════════════════════════════════════════════════
+ * DREAM OS v2.1 - SOVEREIGN ENTERPRISE EDITION
+ * The Power Soul of Shalawat - Limited Edition 2026
  */
 
 const CONFIG = {
+    version: '2.1.0-sovereign',
     supabase: {
         url: 'https://lfavawkzvdhdpaaplaiq.supabase.co',
         key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmYXZhd2t6dmRoZHBhYXBsYWlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5Mjc0NjgsImV4cCI6MjA4OTUwMzQ2OH0.EhwnhAd20lUVaWHHB51UdWCGWxkyTaWIrsPY8xvhwE00'
     },
-    access: { key: 'b15m1ll4h_012443410' }
+    ghost: { tapCount: 5, code: 'dreamos2026' }
 };
 
-const _db = supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.key);
+const ROLE_CONFIG = {
+    master: { level: 100, passwords: ['b15m1ll4h_012443410', 'Mr.M_Architect_2025'], displayName: 'Master M' },
+    admin: { level: 90, passwords: ['4dm1n_AF6969@00'], displayName: 'Admin' }
+};
 
-const DREAM_CORE = {
-    async init() {
-        if (!sessionStorage.getItem('dream_os_authorized')) {
-            this.renderLogin();
-        } else {
-            this.renderShell();
-            this.hideLoading();
+const Auth = {
+    login(pw) {
+        for (const [role, cfg] of Object.entries(ROLE_CONFIG)) {
+            if (cfg.passwords.includes(pw)) {
+                sessionStorage.setItem('dreamos_role', role);
+                sessionStorage.setItem('dreamos_user', cfg.displayName);
+                return true;
+            }
         }
+        return false;
     },
+    logout() { sessionStorage.clear(); location.reload(); }
+};
 
-    renderLogin() {
-        const shell = document.getElementById('app-shell');
-        shell.innerHTML = `
-            <div style="height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#020617; color:white; padding:20px; font-family:sans-serif;">
-                <h1 style="color:#10b981; font-family:'Amiri',serif; font-size:40px; margin-bottom:10px;">بِسْمِ اللَّهِ</h1>
-                <p style="font-size:10px; color:#64748b; margin-bottom:30px; letter-spacing:2px;">SOVEREIGN ACCESS CONTROL</p>
-                <input type="password" id="auth-key" placeholder="Enter Key..." 
-                    style="width:80%; padding:18px; border-radius:15px; border:1px solid #10b981; background:#0f172a; color:white; text-align:center; margin-bottom:15px; font-size:18px;">
-                <button onclick="window.AUTHORIZE_SYSTEM()" 
-                    style="width:80%; padding:18px; border-radius:15px; border:none; background:#10b981; color:black; font-weight:bold; font-size:16px;">
-                    OPEN SYSTEM
-                </button>
-            </div>
-        `;
-        const loader = document.getElementById('loading-screen');
-        if(loader) loader.style.display = 'none';
-    },
-
-    renderShell() {
-        const shell = document.getElementById('app-shell');
-        shell.innerHTML = `
-            <header style="text-align:center; padding:30px 20px 10px; background:linear-gradient(to bottom, #020617, transparent);">
-                <p style="font-family:'Amiri',serif; font-size:28px; color:#10b981; margin:0;">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
-                <div id="clock" style="font-family:monospace; color:#4ade80; font-size:14px; margin-top:5px; letter-spacing:2px;">00:00:00</div>
-            </header>
-
-            <main id="viewport" style="padding:20px; display:grid; grid-template-columns: 1fr 1fr; gap:12px; animation: slideUp 0.6s ease-out;">
-                ${this.createWidget('Dana Umum', 'fa-wallet', '#10b981', 'command-center')}
-                ${this.createWidget('Laporan SPJ', 'fa-file-invoice', '#3b82f6', 'dana')}
-                ${this.createWidget('Harian', 'fa-calendar-day', '#f59e0b', 'maintenance')}
-                ${this.createWidget('Mingguan', 'fa-calendar-week', '#8b5cf6', 'maintenance')}
-                ${this.createWidget('Bulanan', 'fa-calendar-alt', '#ec4899', 'maintenance')}
-                ${this.createWidget('Tahunan', 'fa-archive', '#94a3b8', 'maintenance')}
-                ${this.createWidget('K3 System', 'fa-shield-alt', '#ef4444', 'k3')}
-                ${this.createWidget('Inventaris', 'fa-boxes', '#06b6d4', 'gudang')}
-            </main>
-
-            <nav style="position:fixed; bottom:0; width:100%; display:flex; justify-content:space-around; padding:20px; background:rgba(2,6,23,0.95); backdrop-filter:blur(10px); border-top:1px solid rgba(16,185,129,0.1);">
-                <i class="fas fa-home" style="color:#10b981; font-size:22px;"></i>
-                <i class="fas fa-qrcode" onclick="window.DREAM_NAV('qr')" style="color:#64748b; font-size:22px;"></i>
-                <i class="fas fa-cog" onclick="window.DREAM_NAV('config')" style="color:#64748b; font-size:22px;"></i>
-            </nav>
-        `;
-        this.updateClock();
-    },
-
-    createWidget(name, icon, color, module) {
-        return `
-            <div onclick="window.DREAM_NAV('${module}')" style="background:rgba(15,23,42,0.8); border:1px solid ${color}33; padding:20px 10px; border-radius:24px; text-align:center; transition:0.3s;" onactive="this.style.transform='scale(0.95)'">
-                <div style="background:${color}15; width:45px; height:45px; border-radius:15px; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; border:1px solid ${color}44;">
-                    <i class="fas ${icon}" style="color:${color}; font-size:20px;"></i>
+function showLoginModal() {
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.style.cssText = 'position:fixed;inset:0;background:#000;z-index:10000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(15px);';
+        modal.innerHTML = `
+            <div style="background:rgba(15,23,42,0.9);border:1px solid #d4af37;border-radius:32px;padding:40px;width:90%;max-width:400px;text-align:center;">
+                <img src="./assets/img/icon-512.png" style="width:120px;margin-bottom:20px;filter:drop-shadow(0 0 10px #d4af37);">
+                <p style="color:#d4af37;font-family:serif;font-size:20px;">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
+                <div style="position:relative;margin:20px 0;">
+                    <input type="password" id="pw" placeholder="Access Key..." style="width:100%;padding:15px;background:#000;border:1px solid #d4af37;border-radius:12px;color:#fff;text-align:center;">
+                    <button id="eye" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#d4af37;cursor:pointer;">👁️</button>
                 </div>
-                <div style="font-size:10px; font-weight:bold; color:#fff; letter-spacing:0.5px;">${name.toUpperCase()}</div>
-                <div style="font-size:8px; color:#475569; margin-top:5px;">ENTER MODULE</div>
-            </div>
-        `;
-    },
+                <button id="go" style="width:100%;padding:15px;background:#d4af37;border:none;border-radius:12px;font-weight:bold;cursor:pointer;">LOGIN</button>
+            </div>`;
+        document.body.appendChild(modal);
+        const input = modal.querySelector('#pw'), eye = modal.querySelector('#eye');
+        eye.onclick = () => { input.type = input.type === 'password' ? 'text' : 'password'; eye.innerHTML = input.type === 'password' ? '👁️' : '🙈'; };
+        modal.querySelector('#go').onclick = () => { if(Auth.login(input.value)) { modal.remove(); location.reload(); } else { alert('Wrong Key!'); } };
+    });
+}
 
-    updateClock() {
-        setInterval(() => {
-            const el = document.getElementById('clock');
-            if(el) el.innerText = new Date().toLocaleTimeString('id-ID', {hour12:false}).replace(/\./g, ':');
-        }, 1000);
-    },
+async function renderApp() {
+    document.getElementById('app-shell').innerHTML = `
+        <header id="islamic-header" style="border:1px solid #d4af37;border-radius:20px;padding:20px;margin:16px;text-align:center;cursor:pointer;">
+            <p style="font-size:24px;color:#d4af37;">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
+            <p style="color:#64748b;font-size:10px;letter-spacing:3px;">THE POWER SOUL OF SHALAWAT</p>
+        </header>
+        <div id="main-content" style="padding:16px;margin-bottom:80px;color:#fff;text-align:center;">Selamat Datang, Master M</div>
+        <nav style="position:fixed;bottom:0;left:0;right:0;background:#020617;border-top:1px solid #d4af37;display:flex;justify-content:space-around;padding:12px;z-index:1000;">
+            <button onclick="location.reload()" style="background:none;border:none;color:#d4af37;"><i class="fas fa-home"></i><br><span style="font-size:10px;">Home</span></button>
+            <button style="background:none;border:none;color:#64748b;"><i class="fas fa-qrcode"></i><br><span style="font-size:10px;">QR</span></button>
+            <button style="background:none;border:none;color:#64748b;"><i class="fas fa-user-shield"></i><br><span style="font-size:10px;">Profile</span></button>
+            <button style="background:none;border:none;color:#64748b;"><i class="fas fa-cog"></i><br><span style="font-size:10px;">Setup</span></button>
+            <button onclick="Auth.logout()" style="background:none;border:none;color:#ef4444;"><i class="fas fa-power-off"></i><br><span style="font-size:10px;">Exit</span></button>
+        </nav>
+    `;
+    let taps = 0;
+    document.getElementById('islamic-header').onclick = () => {
+        taps++;
+        if(taps === 5) { if(prompt('Code?') === 'dreamos2026') alert('Ghost Active!'); taps = 0; }
+        setTimeout(() => taps = 0, 2000);
+    };
+}
 
-    hideLoading() {
-        const loader = document.getElementById('loading-screen');
-        if(loader) loader.style.display = 'none';
-    }
-};
-
-window.AUTHORIZE_SYSTEM = () => {
-    const key = document.getElementById('auth-key').value;
-    if(key === CONFIG.access.key) {
-        sessionStorage.setItem('dream_os_authorized', 'true');
-        location.reload();
-    } else { alert("Akses Ditolak!"); }
-};
-
-window.DREAM_NAV = async (modulePath) => {
-    const view = document.getElementById('viewport');
-    view.innerHTML = `<div style="grid-column: span 2; text-align:center; padding:50px; color:#10b981;"><i class="fas fa-circle-notch fa-spin"></i> Loading Module...</div>`;
-    
-    try {
-        const mod = await import(`./modules/${modulePath}/module.js`);
-        view.innerHTML = await mod.default.render();
-    } catch (e) {
-        view.innerHTML = `<div style="grid-column: span 2; color:#ef4444; text-align:center;">Module ${modulePath} belum aktif, Master.</div>`;
-        setTimeout(() => location.reload(), 2000);
-    }
-};
-
-DREAM_CORE.init();
+async function init() {
+    if(!sessionStorage.getItem('dreamos_role')) await showLoginModal();
+    else await renderApp();
+}
+init();
