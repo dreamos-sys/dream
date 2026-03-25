@@ -1,56 +1,37 @@
-Alert('🤖 AI Speak Module Loaded');
+/**
+ * MODULE: AI-CHAT v2.1
+ * Interface: Sovereign Glassmorphism Bubble Chat
+ */
+export default {
+    render: async (ctx) => {
+        return `
+            <div class="animate-fade" style="display: flex; flex-direction: column; height: calc(100vh - 150px); color: #fff; padding: 10px;">
+                <div style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; padding: 15px; border-radius: 20px; display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                    <div style="width: 40px; height: 40px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000;">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div>
+                        <h4 style="margin: 0; font-size: 14px;">Mrs Gemini Copilot</h4>
+                        <small style="color: #10b981; font-size: 10px;">● Online - Sovereign System</small>
+                    </div>
+                </div>
 
-(function() {
-    const supabase = window.supabase;
-    const chatDisplay = document.getElementById('chat-display');
-    const chatInput = document.getElementById('chat-input');
-    const sendBtn = document.getElementById('send-btn');
-    const voiceBtn = document.getElementById('voice-btn');
-    const voiceWave = document.getElementById('voice-wave');
+                <div id="chat-window" style="flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 15px;">
+                    <div style="align-self: flex-start; max-width: 85%; background: rgba(30, 41, 59, 0.8); padding: 12px; border-radius: 20px 20px 20px 5px; font-size: 13px; line-height: 1.4; border-left: 3px solid #10b981;">
+                        بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ <br><br>
+                        Siap Master, ada yang bisa saya bantu untuk optimasi Dream OS hari ini?
+                    </div>
+                </div>
 
-    // Add message to chat
-    function addMessage(text, isUser = false) {
-        if(!chatDisplay) return;
-        const div = document.createElement('div');
-        div.className = `flex items-start gap-3 mb-4 ${isUser ? 'flex-row-reverse' : ''}`;
-        div.innerHTML = `
-            <div class="w-10 h-10 rounded-full ${isUser ? 'bg-blue-600' : 'bg-purple-600'} flex items-center justify-center text-xl shadow-lg border border-white/10">${isUser ? '👤' : '🤖'}</div>
-            <div class="${isUser ? 'bg-blue-600' : 'bg-slate-800'} p-4 rounded-2xl ${isUser ? 'rounded-tr-none' : 'rounded-tl-none'} max-w-[85%] shadow-xl border border-white/5">
-                <p class="text-[13px] leading-relaxed text-white">${text}</p>
-                <p class="text-[9px] opacity-40 mt-2 uppercase tracking-widest font-mono">${isUser ? 'User' : 'Dream AI'} • Now</p>
+                <div style="padding: 15px 0; display: flex; gap: 10px;">
+                    <input type="text" id="ai-input" placeholder="Ketik pesan..." style="flex: 1; background: rgba(15, 23, 42, 0.8); border: 1px solid #334155; color: #fff; padding: 15px; border-radius: 15px; font-size: 14px; outline: none;">
+                    <button onclick="alert('Mrs Gemini sedang berpikir...')" style="background: #10b981; color: #000; border: none; width: 50px; border-radius: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                
+                <button onclick="location.reload()" style="background: transparent; color: #64748b; border: none; font-size: 12px; text-decoration: underline; margin-top: 5px;">KEMBALI KE HOME</button>
             </div>
         `;
-        chatDisplay.appendChild(div);
-        chatDisplay.scrollTop = chatDisplay.scrollHeight;
     }
-
-    async function getAIResponse(question) {
-        const q = question.toLowerCase();
-        try {
-            if (q.includes('booking')) {
-                const { count } = await supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('status', 'pending');
-                return `📅 Status: Ada **${count || 0} booking** yang masih pending di sistem SIF Al-Fikri.`;
-            }
-            if (q.includes('k3')) {
-                const { count } = await supabase.from('k3_reports').select('*', { count: 'exact', head: true }).eq('status', 'pending');
-                return `⚠️ Laporan: Terdeteksi **${count || 0} temuan K3** baru yang butuh verifikasi.`;
-            }
-            if (q.includes('hanung')) {
-                return `✍️ Bapak **Hanung Budianto, S.E.** bertindak sebagai Final Approver di sistem ini.`;
-            }
-        } catch (e) { return "❌ Error: Gagal koneksi ke Core Supabase."; }
-        return `🤖 Siap Master M! Apa lagi yang bisa saya bantu terkait operasional sistem?`;
-    }
-
-    async function sendMessage() {
-        const text = chatInput.value.trim();
-        if (!text) return;
-        addMessage(text, true);
-        chatInput.value = '';
-        const response = await getAIResponse(text);
-        addMessage(response);
-    }
-
-    sendBtn?.addEventListener('click', sendMessage);
-    chatInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
-})();
+};
