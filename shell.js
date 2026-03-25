@@ -268,7 +268,7 @@ function renderLogin() {
     const app = document.getElementById('app-shell');
     app.innerHTML = `
         <div class="app-container">
-            <div class="header">
+            <div class="header"><img src="./assets/img/icon-512.png" alt="Dream OS" style="width: 80px; height: 80px; border-radius: 20px; margin-bottom: 15px;">
                 <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
                 <p style="color:#64748b; font-size:12px; margin-top:10px;">THE POWER SOUL OF SHALAWAT</p>
             </div>
@@ -315,7 +315,7 @@ function renderDashboard() {
     
     app.innerHTML = `
         <div class="app-container" style="padding-bottom: 80px;">
-            <div class="header" id="ghost-trigger">
+            <div class="header" id="ghost-trigger"><img src="./assets/img/icon-512.png" alt="Dream OS" style="width: 60px; height: 60px; border-radius: 16px; margin-bottom: 10px;">
                 <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
                 <p style="color:#64748b; font-size:12px;">${currentUser} • ${currentRole}</p>
             </div>
