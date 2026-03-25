@@ -1,0 +1,84 @@
+/* ══════════════════════════════════════════════════════════════
+ * DREAM OS v2.1 - ULTIMATE ENTERPRISE CSS
+ * "The Power Soul of Shalawat" - Ghost Architect Signature
+ * ══════════════════════════════════════════════════════════════ */
+
+:root {
+    --bg-main: #020617;
+    --primary: #10b981;
+    --primary-light: #34d399;
+    --ghost-purple: #8b5cf6;
+    --glass: rgba(15, 23, 42, 0.8);
+    --border: rgba(16, 185, 129, 0.2);
+}
+
+body {
+    background-color: var(--bg-main);
+    color: #e2e8f0;
+    font-family: sans-serif;
+    margin: 0;
+}
+
+.header-main {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), #020617);
+    border-bottom: 1px solid var(--border);
+    padding: 30px 20px;
+    text-align: center;
+    border-radius: 0 0 35px 35px;
+}
+
+.txt-bismillah {
+    font-size: 28px;
+    color: var(--primary);
+    margin-bottom: 5px;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 20px;
+}
+
+.mod-card {
+    background: var(--glass);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 22px;
+    padding: 18px 10px;
+    text-align: center;
+}
+
+.mod-icon {
+    width: 55px;
+    height: 55px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin: 0 auto 10px;
+}
+
+.nav-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(2, 6, 23, 0.95);
+    display: flex;
+    justify-content: space-around;
+    padding: 15px 5px;
+    border-top: 1px solid var(--border);
+}
+
+.nav-qr {
+    width: 65px;
+    height: 65px;
+    background: var(--primary);
+    border-radius: 50%;
+    margin-top: -45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 6px solid var(--bg-main);
+}
