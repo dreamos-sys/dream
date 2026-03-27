@@ -57,7 +57,7 @@ function showLoginModal() {
                 errorDiv.innerText = 'Please enter username and password';
                 return;
             }
-            const safeUsername = username.replace(/@/g, '_at_');
+            const safeUsername = username.replace(/@/g, '_at_').toLowerCase();
             const email = `${safeUsername}@dreamos.local`;
             try {
                 const { data, error } = await supabase.auth.signInWithPassword({ email, password });
