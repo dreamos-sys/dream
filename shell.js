@@ -27,26 +27,28 @@ function logout() {
     location.reload();
 }
 
+// Mapping dari nama modul di card ke folder yang sebenarnya
+const moduleMap = {
+    inventory: 'stok',      // Stok
+    maintenance: 'maintenance',
+    security: 'sekuriti',   // Security
+    report: 'inventaris',   // Report -> inventaris (bisa diubah nanti)
+    profile: 'profile',
+    settings: 'settings'
+};
+
 async function loadModule(moduleName) {
     const contentDiv = document.getElementById('content');
     contentDiv.innerHTML = '<div style="text-align:center; padding:20px;">⏳ Memuat modul...</div>';
+    const folder = moduleMap[moduleName] || moduleName;
     try {
-        // Mapping nama modul dari dataset ke folder yang sebenarnya
-        const moduleMap = {
-            inventory: 'stok',
-            maintenance: 'maintenance',
-            security: 'sekuriti',
-            report: 'report'   // jika ada folder report, sesuaikan
-        };
-        const folder = moduleMap[moduleName] || moduleName;
         const module = await import(`./modules/${folder}/module.js`);
         const html = module.default.render({ user: currentUser, toast: (msg) => alert(msg) });
         contentDiv.innerHTML = html;
-        // Jika module punya afterRender, panggil
         if (module.default.afterRender) module.default.afterRender({ user: currentUser });
     } catch (err) {
         console.error(err);
-        contentDiv.innerHTML = `<div style="background:#0f172a; padding:20px; border-radius:12px;">❌ Modul "${moduleName}" belum siap atau error: ${err.message}</div>`;
+        contentDiv.innerHTML = `<div style="background:#0f172a; padding:20px; border-radius:12px;">❌ Modul "${moduleName}" (folder ${folder}) belum siap: ${err.message}</div>`;
     }
 }
 
@@ -75,7 +77,7 @@ function renderApp() {
         <footer>DREAM TEAM © 2026 · v2.1</footer>
     `;
 
-    // Event listener untuk card modul
+    // Event listener untuk card
     document.querySelectorAll('.card').forEach(card => {
         card.addEventListener('click', () => {
             const module = card.dataset.module;
@@ -83,13 +85,17 @@ function renderApp() {
         });
     });
 
-    // Navigasi sederhana (home, profile, settings)
+    // Event listener untuk navigasi bawah
     document.querySelectorAll('.nav button').forEach(btn => {
         btn.addEventListener('click', () => {
             const page = btn.dataset.page;
-            if (page === 'home') renderApp();
-            else if (page === 'profile') loadModule('profile');
-            else if (page === 'settings') loadModule('settings');
+            if (page === 'home') {
+                renderApp();
+            } else if (page === 'profile') {
+                loadModule('profile');
+            } else if (page === 'settings') {
+                loadModule('settings');
+            }
         });
     });
 }
