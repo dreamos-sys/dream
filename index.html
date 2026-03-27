@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Dream OS v2.1 - Sovereign Enterprise</title>
+    <title>Dream OS v2.1 - AI Agent Super</title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#0a0f1e">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -48,21 +48,21 @@
             align-items: center;
             pointer-events: none;
         }
-        .ghost-console {
+        .ai-badge {
             position: fixed;
             bottom: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.8);
-            border-left: 3px solid #a855f7;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-family: monospace;
+            right: 20px;
+            background: rgba(168,85,247,0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 6px 12px;
             font-size: 10px;
             z-index: 9999;
-            display: none;
+            border: 1px solid rgba(168,85,247,0.3);
         }
-        .ghost-console.active {
-            display: block;
+        .ai-badge i {
+            color: #a855f7;
+            margin-right: 4px;
         }
     </style>
 </head>
@@ -70,59 +70,65 @@
     <div id="loading-screen">
         <div class="loader"></div>
         <p style="margin-top: 20px; color: #10b981;">DREAM OS BOOTING...</p>
-        <p style="margin-top: 8px; color: #64748b; font-size: 12px;">The Power Soul of Shalawat</p>
+        <p style="margin-top: 8px; color: #64748b; font-size: 12px;">AI Agent Super v7.0 | LLM Ready</p>
     </div>
     <div id="toast-container"></div>
     <div id="app-shell"></div>
-    <div id="ghost-console" class="ghost-console"></div>
+    <div class="ai-badge">
+        <i class="fas fa-brain"></i> AI Agent Super v7.0 | Multi-LLM
+    </div>
     
     <script type="module">
+        import { aiService } from './services/ai-service.js';
+        import { syncService } from './services/sync-service.js';
+        import { notificationService } from './services/notification-service.js';
         import { dreamOS } from './core/system.js';
         import { dbRecovery } from './core/database-recovery.js';
         import { ghostScanner } from './core/ghost-scanner.js';
         
-        // Global ghost access
+        // Global services
+        window.aiService = aiService;
+        window.syncService = syncService;
+        window.notificationService = notificationService;
         window.ghostScanner = ghostScanner;
         window.dbRecovery = dbRecovery;
         
-        // Ghost mode activation on console
-        console.log('%c👻 GHOST MODE: Type ghostScanner.scan() for system diagnosis', 'color: #a855f7; font-size: 12px;');
-        console.log('%c👻 GHOST MODE: Type ghostScanner.recover() for emergency recovery', 'color: #a855f7;');
-        console.log('%c👻 GHOST MODE: Type ghostScanner.export() to export all data', 'color: #a855f7;');
+        // Initialize all services
+        console.log('%c🤖 DREAM OS AI AGENT SUPER v7.0', 'color: #a855f7; font-size: 16px; font-weight: bold;');
+        console.log('%cMulti-LLM Support | Real-time Sync | Push Notifications', 'color: #10b981;');
+        console.log('%cType: aiService.chat("your message") - Talk to AI', 'color: #64748b;');
+        console.log('%cType: ghostScanner.scan() - System Diagnosis', 'color: #64748b;');
         
-        // Show ghost console on triple click
-        let clickCount = 0;
-        let clickTimer;
-        document.addEventListener('click', () => {
-            clickCount++;
-            if (clickTimer) clearTimeout(clickTimer);
-            clickTimer = setTimeout(() => clickCount = 0, 1000);
-            if (clickCount === 3) {
-                const console = document.getElementById('ghost-console');
-                console.classList.toggle('active');
-                if (console.classList.contains('active')) {
-                    console.innerHTML = `
-                        <i class="fas fa-ghost"></i> Ghost Console Active<br>
-                        📊 ghostScanner.scan() - Full system scan<br>
-                        🔄 ghostScanner.recover() - Emergency recovery<br>
-                        📁 ghostScanner.export() - Export all data<br>
-                        💾 dbRecovery.emergencyBackup() - Create backup
-                    `;
-                }
-                clickCount = 0;
-            }
-        });
-        
-        // Initialize system
         try {
-            await dbRecovery.init();
+            // Initialize services
+            await aiService.init();
+            await notificationService.init();
+            
+            // Setup Supabase
+            const supabase = window.supabase.createClient(
+                'https://lfavawkzvdhdpaaplaiq.supabase.co',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmYXZhd2t6dmRoZHBhYXBsYWlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5Mjc0NjgsImV4cCI6MjA4OTUwMzQ2OH0.EhwnhAd20lUVaWHHB51UdWCGWxkyTaWIrsPY8xvhwE00'
+            );
+            await syncService.init(supabase);
+            
+            // Initialize core system
             await dreamOS.init();
             
-            // Load main app
+            // Show welcome notification
+            await notificationService.notify({
+                title: 'Dream OS AI Agent',
+                body: 'System ready! AI Agent Super v7.0 active.',
+                icon: './assets/img/icon-192.png'
+            });
+            
+            // Load auth module
             const authModule = await dreamOS.loadModule('auth');
             const app = await authModule.render({
                 user: null,
-                toast: (msg) => { console.log(msg); }
+                toast: (msg) => console.log(msg),
+                aiService: aiService,
+                syncService: syncService,
+                notificationService: notificationService
             });
             
             document.getElementById('app-shell').innerHTML = app;
@@ -139,21 +145,18 @@
             console.error('Fatal error:', error);
             dreamOS.enterGhostMode('system_init_failed');
             
-            // Ghost mode fallback UI
             document.getElementById('app-shell').innerHTML = `
                 <div style="text-align:center;padding:50px;">
                     <i class="fas fa-ghost" style="font-size:64px;color:#a855f7;"></i>
                     <h2 style="color:#a855f7;">Ghost Mode Active</h2>
-                    <p>System in emergency recovery mode</p>
+                    <p>AI Agent in emergency recovery mode</p>
                     <div style="margin-top:20px;background:rgba(0,0,0,0.5);padding:20px;border-radius:12px;text-align:left;">
                         <p><strong>Error:</strong> ${error.message}</p>
-                        <button onclick="ghostScanner.scan().then(r=>alert('Scan complete. Check console.'))" 
-                            style="margin-top:10px;background:#a855f7;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;">
-                            Run System Scan
+                        <button onclick="ghostScanner.scan()" style="margin-top:10px;background:#a855f7;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;">
+                            <i class="fas fa-search"></i> Run System Scan
                         </button>
-                        <button onclick="ghostScanner.recover()" 
-                            style="margin-top:10px;margin-left:10px;background:#10b981;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;">
-                            Emergency Recovery
+                        <button onclick="ghostScanner.recover()" style="margin-top:10px;margin-left:10px;background:#10b981;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;">
+                            <i class="fas fa-heartbeat"></i> Emergency Recovery
                         </button>
                     </div>
                 </div>
