@@ -9,4 +9,6 @@ window.MODULES = [
   { id: 'k3', name: 'k3', icon: 'fa-folder', description: '' },
   { id: 'asset', name: 'asset', icon: 'fa-folder', description: '' },
   { id: 'commandcenter', name: 'commandcenter', icon: 'fa-folder', description: '' },
+  { id: 'inventaris', name: 'inventaris', icon: 'fa-folder', description: '' },
+  { id: 'audit', name: 'audit', icon: 'fa-folder', description: '' },
 ];
