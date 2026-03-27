@@ -20,5 +20,5 @@ window.MODULES = [
   { id: 'scanner', name: 'scanner', icon: 'fa-folder', description: '' },
   { id: 'sekuriti', name: 'sekuriti', icon: 'fa-folder', description: '' },
   { id: 'settings', name: 'settings', icon: 'fa-folder', description: '' },
-  { id: 'stok', name: 'stok', icon: 'fa-folder', description: '' },
+  { id: 'stok', name: 'Stok Management', icon: 'fa-boxes', description: 'Kelola stok barang' },
 ];
