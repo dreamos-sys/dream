@@ -8,8 +8,8 @@
 const CONFIG = {
     // SUPABASE CORE ENGINE
     // Ganti dengan API Key & URL dari dashboard Supabase Anda
-    SUPABASE_URL: "https://your-project-id.supabase.co",
-    SUPABASE_ANON_KEY: "your-anon-public-key",
+    SUPABASE_URL: "https://lfavawkzvdhdpaaplaiq.supabase.co",
+    SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmYXZhd2t6dmRoZHBhYXBsYWlxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzkyNzQ2OCwiZXhwIjoyMDg5NTAzNDY4fQ.8bnBvHA-qbvaBDsRJcWN4atqYiRjB8EX34IINZsdWk8",
 
     // SYSTEM IDENTITY
     VERSION: "13.4.1-STABLE",
