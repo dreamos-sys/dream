@@ -27,6 +27,29 @@ function logout() {
     location.reload();
 }
 
+async function loadModule(moduleName) {
+    const contentDiv = document.getElementById('content');
+    contentDiv.innerHTML = '<div style="text-align:center; padding:20px;">⏳ Memuat modul...</div>';
+    try {
+        // Mapping nama modul dari dataset ke folder yang sebenarnya
+        const moduleMap = {
+            inventory: 'stok',
+            maintenance: 'maintenance',
+            security: 'sekuriti',
+            report: 'report'   // jika ada folder report, sesuaikan
+        };
+        const folder = moduleMap[moduleName] || moduleName;
+        const module = await import(`./modules/${folder}/module.js`);
+        const html = module.default.render({ user: currentUser, toast: (msg) => alert(msg) });
+        contentDiv.innerHTML = html;
+        // Jika module punya afterRender, panggil
+        if (module.default.afterRender) module.default.afterRender({ user: currentUser });
+    } catch (err) {
+        console.error(err);
+        contentDiv.innerHTML = `<div style="background:#0f172a; padding:20px; border-radius:12px;">❌ Modul "${moduleName}" belum siap atau error: ${err.message}</div>`;
+    }
+}
+
 function renderApp() {
     document.getElementById('loading').style.display = 'none';
     const app = document.getElementById('app');
@@ -51,18 +74,22 @@ function renderApp() {
         </nav>
         <footer>DREAM TEAM © 2026 · v2.1</footer>
     `;
+
+    // Event listener untuk card modul
     document.querySelectorAll('.card').forEach(card => {
         card.addEventListener('click', () => {
             const module = card.dataset.module;
-            document.getElementById('content').innerHTML = `<div style="background:#0f172a; padding:20px; border-radius:12px;">📦 Module ${module} (coming soon)</div>`;
+            loadModule(module);
         });
     });
+
+    // Navigasi sederhana (home, profile, settings)
     document.querySelectorAll('.nav button').forEach(btn => {
         btn.addEventListener('click', () => {
             const page = btn.dataset.page;
             if (page === 'home') renderApp();
-            else if (page === 'profile') document.getElementById('content').innerHTML = '<div style="background:#0f172a; padding:20px;">👤 Profile: ' + currentUser + '</div>';
-            else if (page === 'settings') document.getElementById('content').innerHTML = '<div style="background:#0f172a; padding:20px;">⚙️ Settings page</div>';
+            else if (page === 'profile') loadModule('profile');
+            else if (page === 'settings') loadModule('settings');
         });
     });
 }
