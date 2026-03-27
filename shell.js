@@ -27,20 +27,103 @@ function logout() {
     location.reload();
 }
 
-async function loadModule(moduleId) {
-    const contentDiv = document.getElementById('content');
-    contentDiv.innerHTML = '<div style="text-align:center; padding:20px;">⏳ Memuat modul...</div>';
+// ========== MODAL SYSTEM ==========
+function createModal() {
+    // Cek apakah modal sudah ada
+    let modal = document.getElementById('module-modal');
+    if (modal) return modal;
+
+    // Buat struktur modal
+    modal = document.createElement('div');
+    modal.id = 'module-modal';
+    modal.style.cssText = `
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        backdrop-filter: blur(8px);
+        z-index: 10000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+    `;
+
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background: #0f172a;
+        border-radius: 24px;
+        max-width: 600px;
+        width: 100%;
+        max-height: 90%;
+        overflow-y: auto;
+        position: relative;
+        border: 1px solid #10b981;
+        box-shadow: 0 20px 35px rgba(0,0,0,0.3);
+    `;
+
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '&times;';
+    closeBtn.style.cssText = `
+        position: sticky;
+        top: 10px;
+        right: 10px;
+        float: right;
+        background: #10b981;
+        border: none;
+        color: #000;
+        font-size: 24px;
+        font-weight: bold;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        margin: 10px;
+        z-index: 1;
+    `;
+    closeBtn.onclick = () => modal.style.display = 'none';
+
+    const modalBody = document.createElement('div');
+    modalBody.id = 'modal-body';
+    modalBody.style.padding = '20px';
+    modalBody.style.color = '#e2e8f0';
+
+    modalContent.appendChild(closeBtn);
+    modalContent.appendChild(modalBody);
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+
+    // Tutup modal jika klik di luar konten
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+    });
+
+    return modal;
+}
+
+async function loadModuleInModal(moduleId) {
+    const modal = createModal();
+    const modalBody = document.getElementById('modal-body');
+    if (!modalBody) return;
+
+    modalBody.innerHTML = '<div style="text-align:center; padding:20px;">⏳ Memuat modul...</div>';
+    modal.style.display = 'flex';
+
     try {
         const module = await import(`./modules/${moduleId}/module.js`);
         const html = module.default.render({ user: currentUser, toast: (msg) => alert(msg) });
-        contentDiv.innerHTML = html;
+        modalBody.innerHTML = html;
         if (module.default.afterRender) module.default.afterRender({ user: currentUser });
     } catch (err) {
         console.error(err);
-        contentDiv.innerHTML = `<div style="background:#0f172a; padding:20px; border-radius:12px;">❌ Modul "${moduleId}" belum siap: ${err.message}</div>`;
+        modalBody.innerHTML = `<div style="background:#0f172a; padding:20px; border-radius:12px;">❌ Modul "${moduleId}" belum siap: ${err.message}</div>`;
     }
 }
 
+// ========== RENDER DASHBOARD ==========
 function renderApp() {
     document.getElementById('loading').style.display = 'none';
     const app = document.getElementById('app');
@@ -66,7 +149,6 @@ function renderApp() {
         <div class="grid" id="module-grid">
             ${cardsHtml}
         </div>
-        <div id="content" style="margin: 20px 0; text-align: center; color: #94a3b8;">Pilih menu di atas</div>
         <nav class="nav">
             <button data-page="home"><i class="fas fa-home"></i><br>Home</button>
             <button data-page="profile"><i class="fas fa-user"></i><br>Profile</button>
@@ -76,29 +158,30 @@ function renderApp() {
         <footer>DREAM TEAM © 2026 · v2.1</footer>
     `;
 
-    // Attach event listeners to cards
+    // Event listener untuk card
     document.querySelectorAll('.card').forEach(card => {
         card.addEventListener('click', () => {
             const moduleId = card.dataset.module;
-            loadModule(moduleId);
+            loadModuleInModal(moduleId);
         });
     });
 
-    // Navigasi bawah
+    // Navigasi bawah (home, profile, settings) juga pakai modal
     document.querySelectorAll('.nav button').forEach(btn => {
         btn.addEventListener('click', () => {
             const page = btn.dataset.page;
             if (page === 'home') {
                 renderApp();
             } else if (page === 'profile') {
-                loadModule('profile');
+                loadModuleInModal('profile');
             } else if (page === 'settings') {
-                loadModule('settings');
+                loadModuleInModal('settings');
             }
         });
     });
 }
 
+// ========== INIT ==========
 window.onload = () => {
     // Load modules list first
     const script = document.createElement('script');
