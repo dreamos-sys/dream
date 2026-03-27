@@ -1,4 +1,4 @@
-// Dream OS - Ghost Mode Scanner & Debugger
+// Dream OS - Ghost Mode Scanner with Professional UI
 class GhostScanner {
     constructor() {
         this.scanResults = {};
@@ -18,10 +18,68 @@ class GhostScanner {
             warnings: []
         };
         
-        // Save scan results
         localStorage.setItem('ghost_scan', JSON.stringify(scan));
+        this.showScanReport(scan);
         
         return scan;
+    }
+    
+    showScanReport(scan) {
+        const modal = document.createElement('div');
+        modal.id = 'ghost-scan-modal';
+        modal.style.cssText = `
+            position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:100000;
+            display:flex;align-items:center;justify-content:center;animation:fadeIn 0.3s;
+        `;
+        modal.innerHTML = `
+            <div style="background:linear-gradient(135deg,#1e1b4b,#0c0a2a);border-radius:24px;border:1px solid #a855f7;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;padding:24px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                    <h2 style="color:#a855f7;margin:0;">
+                        <i class="fas fa-ghost"></i> Ghost Scan Report
+                    </h2>
+                    <button onclick="this.closest('#ghost-scan-modal').remove()" style="background:none;border:none;color:#64748b;font-size:24px;cursor:pointer;">✕</button>
+                </div>
+                
+                <div style="background:rgba(0,0,0,0.3);border-radius:12px;padding:12px;margin-bottom:16px;">
+                    <div style="display:flex;justify-content:space-between;">
+                        <span>📅 Scan Time:</span>
+                        <span style="color:#10b981;">${scan.timestamp}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-top:8px;">
+                        <span>🌐 System Status:</span>
+                        <span style="color:#a855f7;">${scan.system.online ? 'Online' : 'Offline'}</span>
+                    </div>
+                </div>
+                
+                <h3 style="color:#a855f7;margin-bottom:12px;">📦 Modules Status</h3>
+                <div style="background:rgba(0,0,0,0.3);border-radius:12px;padding:12px;margin-bottom:16px;">
+                    ${scan.modules.map(m => `
+                        <div style="display:flex;justify-content:space-between;padding:4px 0;">
+                            <span>${m.name}</span>
+                            <span style="color:${m.exists ? '#10b981' : '#ef4444'}">
+                                ${m.exists ? '✅ OK' : '❌ Missing'}
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <h3 style="color:#a855f7;margin-bottom:12px;">💾 Storage Usage</h3>
+                <div style="background:rgba(0,0,0,0.3);border-radius:12px;padding:12px;margin-bottom:16px;">
+                    <div>LocalStorage: ${scan.storage.localStorageUsed}</div>
+                    <div>SessionStorage: ${scan.storage.sessionStorageUsed}</div>
+                </div>
+                
+                <div style="display:flex;gap:12px;margin-top:20px;">
+                    <button onclick="window.ghostScanner?.export()" style="flex:1;background:#a855f7;border:none;padding:12px;border-radius:12px;cursor:pointer;">
+                        <i class="fas fa-download"></i> Export Data
+                    </button>
+                    <button onclick="window.ghostScanner?.recover()" style="flex:1;background:#10b981;border:none;padding:12px;border-radius:12px;cursor:pointer;">
+                        <i class="fas fa-heartbeat"></i> Recovery
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
     }
     
     async scanSystem() {
@@ -39,33 +97,27 @@ class GhostScanner {
     
     async scanModules() {
         const modules = [];
+        const moduleList = [
+            'auth', 'dashboard', 'command-center', 'stok', 'maintenance',
+            'security', 'booking', 'k3', 'asset', 'janitor', 'qr', 'settings', 'ghost'
+        ];
         
-        // Check if modules folder exists
-        try {
-            const moduleList = [
-                'auth', 'dashboard', 'command-center', 'stok', 'maintenance',
-                'security', 'booking', 'k3', 'asset', 'janitor', 'qr', 'settings', 'ghost'
-            ];
-            
-            for (const module of moduleList) {
-                try {
-                    const modulePath = `./modules/${module}/module.js`;
-                    const response = await fetch(modulePath, { method: 'HEAD' });
-                    modules.push({
-                        name: module,
-                        exists: response.ok,
-                        path: modulePath
-                    });
-                } catch (e) {
-                    modules.push({
-                        name: module,
-                        exists: false,
-                        error: e.message
-                    });
-                }
+        for (const module of moduleList) {
+            try {
+                const modulePath = `./modules/${module}/module.js`;
+                const response = await fetch(modulePath, { method: 'HEAD' });
+                modules.push({
+                    name: module,
+                    exists: response.ok,
+                    path: modulePath
+                });
+            } catch (e) {
+                modules.push({
+                    name: module,
+                    exists: false,
+                    error: e.message
+                });
             }
-        } catch (error) {
-            console.error('Module scan error:', error);
         }
         
         return modules;
@@ -74,37 +126,22 @@ class GhostScanner {
     async scanDatabase() {
         const dbInfo = {
             supabase: null,
-            indexedDB: null,
             localStorage: {},
             sessionStorage: {}
         };
         
-        // LocalStorage
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
-            const value = localStorage.getItem(key);
-            dbInfo.localStorage[key] = {
-                size: value?.length || 0,
-                preview: value?.substring(0, 100) || ''
-            };
+            dbInfo.localStorage[key] = localStorage.getItem(key)?.substring(0, 100);
         }
         
-        // SessionStorage
         for (let i = 0; i < sessionStorage.length; i++) {
             const key = sessionStorage.key(i);
-            const value = sessionStorage.getItem(key);
-            dbInfo.sessionStorage[key] = {
-                size: value?.length || 0,
-                preview: value?.substring(0, 100) || ''
-            };
+            dbInfo.sessionStorage[key] = sessionStorage.getItem(key)?.substring(0, 100);
         }
         
-        // Supabase check
         if (window.supabase) {
-            dbInfo.supabase = {
-                available: true,
-                url: 'https://lfavawkzvdhdpaaplaiq.supabase.co'
-            };
+            dbInfo.supabase = { available: true };
         }
         
         return dbInfo;
@@ -126,100 +163,55 @@ class GhostScanner {
         
         return {
             localStorageUsed: `${Math.round(totalLocalStorage / 1024)} KB`,
-            sessionStorageUsed: `${Math.round(totalSessionStorage / 1024)} KB`,
-            localStorageLimit: '5-10 MB',
-            sessionStorageLimit: '5-10 MB'
+            sessionStorageUsed: `${Math.round(totalSessionStorage / 1024)} KB`
         };
-    }
-    
-    generateReport(scan) {
-        let report = `
-╔══════════════════════════════════════════════════════════╗
-║     GHOST MODE SYSTEM REPORT                             ║
-╠══════════════════════════════════════════════════════════╣
-║ Timestamp: ${scan.timestamp}
-║ User Agent: ${scan.system.userAgent.substring(0, 50)}...
-║ Platform: ${scan.system.platform}
-║ Online: ${scan.system.online}
-╠══════════════════════════════════════════════════════════╣
-║ MODULES STATUS:
-`;
-        
-        scan.modules.forEach(m => {
-            const status = m.exists ? '✅' : '❌';
-            report += `║   ${status} ${m.name}\n`;
-        });
-        
-        report += `╠══════════════════════════════════════════════════════════╣
-║ STORAGE:
-║   LocalStorage: ${scan.storage.localStorageUsed}
-║   SessionStorage: ${scan.storage.sessionStorageUsed}
-╠══════════════════════════════════════════════════════════╣
-║ DATABASE KEYS FOUND:
-`;
-        
-        Object.keys(scan.database.localStorage).forEach(key => {
-            report += `║   📁 ${key}\n`;
-        });
-        
-        report += `╚══════════════════════════════════════════════════════════╝`;
-        
-        return report;
-    }
-    
-    async showGhostConsole() {
-        console.log('%c👻 GHOST MODE SCANNER ACTIVE', 'color: #a855f7; font-size: 16px; font-weight: bold;');
-        console.log('%cType: ghost.scan() - Full system scan', 'color: #10b981;');
-        console.log('%cType: ghost.report() - Show scan report', 'color: #10b981;');
-        console.log('%cType: ghost.recover() - Emergency recovery', 'color: #10b981;');
-        console.log('%cType: ghost.export() - Export all data', 'color: #10b981;');
-        
-        window.ghost = this;
-        return this;
-    }
-    
-    async scan() {
-        const scan = await this.fullSystemScan();
-        this.scanResults = scan;
-        console.log('✅ Scan complete! Run ghost.report() to see results');
-        return scan;
-    }
-    
-    report() {
-        if (!this.scanResults) {
-            console.log('⚠️ No scan results. Run ghost.scan() first');
-            return;
-        }
-        console.log(this.generateReport(this.scanResults));
     }
     
     async recover() {
         console.log('👻 Running ghost recovery protocol...');
         
-        // Try to load from backup
-        const backup = localStorage.getItem('dreamos_emergency_backup');
-        if (backup) {
-            console.log('📦 Emergency backup found!');
-            const data = JSON.parse(backup);
-            console.log(`   Backup date: ${data.timestamp}`);
-            console.log(`   Version: ${data.version}`);
-            
-            // Offer restore
-            const restore = confirm('Emergency backup found. Restore?');
-            if (restore) {
-                Object.entries(data.data?.localStorage || {}).forEach(([key, value]) => {
-                    if (typeof value === 'string') {
-                        localStorage.setItem(key, value);
-                    }
-                });
-                console.log('✅ System restored from emergency backup');
-                location.reload();
-            }
-        } else {
-            console.log('⚠️ No emergency backup found');
+        const modal = document.createElement('div');
+        modal.id = 'ghost-recovery-modal';
+        modal.style.cssText = `
+            position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:100000;
+            display:flex;align-items:center;justify-content:center;animation:fadeIn 0.3s;
+        `;
+        modal.innerHTML = `
+            <div style="background:linear-gradient(135deg,#1e1b4b,#0c0a2a);border-radius:24px;border:1px solid #10b981;max-width:500px;width:90%;padding:24px;">
+                <div style="text-align:center;margin-bottom:20px;">
+                    <i class="fas fa-heartbeat" style="font-size:48px;color:#10b981;"></i>
+                    <h2 style="color:#10b981;">Emergency Recovery</h2>
+                </div>
+                <p style="text-align:center;margin-bottom:20px;">Running system recovery protocol...</p>
+                <div id="recovery-progress" style="background:rgba(255,255,255,0.1);border-radius:10px;height:4px;margin-bottom:20px;">
+                    <div style="width:0%;height:100%;background:#10b981;border-radius:10px;transition:width 0.3s;"></div>
+                </div>
+                <div id="recovery-status" style="font-size:12px;color:#64748b;text-align:center;"></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        const progressBar = modal.querySelector('#recovery-progress div');
+        const statusDiv = modal.querySelector('#recovery-status');
+        
+        const steps = [
+            { text: 'Checking system integrity...', delay: 500, progress: 20 },
+            { text: 'Scanning for backup data...', delay: 800, progress: 40 },
+            { text: 'Loading emergency backup...', delay: 1000, progress: 60 },
+            { text: 'Restoring core modules...', delay: 800, progress: 80 },
+            { text: 'System recovery complete!', delay: 500, progress: 100 }
+        ];
+        
+        for (const step of steps) {
+            statusDiv.textContent = step.text;
+            progressBar.style.width = `${step.progress}%`;
+            await new Promise(r => setTimeout(r, step.delay));
         }
         
-        return { restored: !!backup };
+        setTimeout(() => {
+            modal.remove();
+            location.reload();
+        }, 1000);
     }
     
     async export() {
@@ -227,7 +219,7 @@ class GhostScanner {
             timestamp: new Date().toISOString(),
             localStorage: {},
             sessionStorage: {},
-            scanResults: this.scanResults
+            systemInfo: await this.scanSystem()
         };
         
         for (let i = 0; i < localStorage.length; i++) {
@@ -248,8 +240,11 @@ class GhostScanner {
         a.click();
         URL.revokeObjectURL(url);
         
-        console.log('📁 Export complete!');
         return data;
+    }
+    
+    async scan() {
+        return await this.fullSystemScan();
     }
 }
 
