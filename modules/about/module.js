@@ -1,17 +1,16 @@
-/**
- * Auto-Generated Module: about
- * Created by Dream OS Sovereign Scanner
- */
 export default {
-    render: async (ctx) => {
+    render: () => {
         return `
-            <div class="animate-fade" style="padding: 20px;">
-                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; border-radius: 20px; padding: 30px; text-align: center;">
-                    <h2 style="color: #10b981;">Modul ${ctx.id}</h2>
-                    <p style="color: #64748b;">Sistem sedang dikembangkan oleh Ghost Architect.</p>
-                    <button onclick="location.reload()" style="background: #10b981; color: #000; border: none; padding: 10px 20px; border-radius: 10px; margin-top: 20px; font-weight: bold;">KEMBALI KE HOME</button>
-                </div>
+            <div style="padding:20px; background:#0f172a; border-radius:12px;">
+                <h3>📌 Tentang Dream OS</h3>
+                <p><strong>Versi:</strong> 2.1 Enterprise</p>
+                <p><strong>Fitur:</strong> Manajemen Aset, K3, Janitor, Maintenance, Booking, Sekuriti, AI Chat, dll.</p>
+                <p><strong>Dikembangkan oleh:</strong> Dream Team</p>
+                <p><strong>Lisensi:</strong> Proprietary</p>
+                <hr>
+                <p><small>© 2026 Dream OS. All rights reserved.</small></p>
             </div>
         `;
-    }
+    },
+    afterRender: () => {}
 };

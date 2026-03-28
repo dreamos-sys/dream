@@ -16,4 +16,6 @@ window.MODULES = [
   { id: 'janitor-indoor', name: 'janitor-indoor', icon: 'fa-folder', description: '' },
   { id: 'janitor-outdoor', name: 'janitor-outdoor', icon: 'fa-folder', description: '' },
   { id: 'sekuriti', name: 'sekuriti', icon: 'fa-folder', description: '' },
+  { id: 'qr', name: 'qr', icon: 'fa-folder', description: '' },
+  // Warning: module 'slides' not found
 ];
