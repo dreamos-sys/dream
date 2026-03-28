@@ -26,10 +26,10 @@ export default {
         };
 
         const callAI = async (prompt) => {
-            // Gunakan proxy CORS (cors-anywhere)
-            const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+            // Gunakan proxy alternatif (corsproxy.io) yang tidak perlu aktivasi
+            const proxyUrl = 'https://corsproxy.io/?';
             const targetUrl = 'https://ollama.com/api/chat';
-            const url = proxyUrl + targetUrl;
+            const url = proxyUrl + encodeURIComponent(targetUrl);
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
