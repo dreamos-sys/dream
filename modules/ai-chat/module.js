@@ -1,4 +1,4 @@
-export default {
+lexport default {
     render: () => {
         return `
             <div style="padding:20px; background:#0f172a; border-radius:12px;">
@@ -26,6 +26,7 @@ export default {
         };
 
         const callAI = async (prompt) => {
+            // GANTI URL INI dengan URL Edge Function yang benar dari dashboard Supabase
             const url = 'https://lfavawkzvdhdpaaplaiq.supabase.co/functions/v1/ai-chat';
             const response = await fetch(url, {
                 method: 'POST',
@@ -54,3 +55,4 @@ export default {
         };
     }
 };
+
