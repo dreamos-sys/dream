@@ -26,7 +26,6 @@ export default {
         };
 
         const callAI = async (prompt) => {
-            // GANTI URL INI DENGAN URL YANG ANDA SALIN
             const url = 'https://lfavawkzvdhdpaaplaiq.supabase.co/functions/v1/ai-chat';
             const response = await fetch(url, {
                 method: 'POST',
