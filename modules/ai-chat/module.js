@@ -26,7 +26,11 @@ export default {
         };
 
         const callAI = async (prompt) => {
-            const res = await fetch('https://ollama.com/api/chat', {
+            // Gunakan proxy CORS (cors-anywhere)
+            const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+            const targetUrl = 'https://ollama.com/api/chat';
+            const url = proxyUrl + targetUrl;
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -38,7 +42,8 @@ export default {
                     stream: false
                 })
             });
-            const data = await res.json();
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
             return data.message?.content || data.response || 'Maaf, tidak ada respons.';
         };
 
