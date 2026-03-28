@@ -106,11 +106,9 @@ export default {
     },
 
     afterRender: async (ctx) => {
-        // Access supabase and user info from context
         const supabase = ctx.supabase;
         const currentUser = ctx.user || { name: 'Guest', role: 'regular' };
 
-        // ========== CONFIG ==========
         const CONFIG = {
             WORK_HOURS: { start: 7.5, end: 16.0 },
             FRIDAY_PRAYER_BLOCK: { start: 10.5, end: 13.0 },
@@ -140,40 +138,23 @@ export default {
             ]
         };
 
-        // ========== Helper functions ==========
-        function timeToDecimal(timeStr) {
-            const [h, m] = timeStr.split(':').map(Number);
-            return h + (m / 60);
-        }
-        function decimalToTime(decimal) {
-            const h = Math.floor(decimal);
-            const m = Math.round((decimal - h) * 60);
-            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-        }
-        function getDayName(dateStr) {
-            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-            return days[new Date(dateStr + 'T00:00:00').getDay()];
-        }
+        function timeToDecimal(timeStr) { const [h, m] = timeStr.split(':').map(Number); return h + (m / 60); }
+        function decimalToTime(decimal) { const h = Math.floor(decimal); const m = Math.round((decimal - h) * 60); return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`; }
+        function getDayName(dateStr) { const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu']; return days[new Date(dateStr + 'T00:00:00').getDay()]; }
         function isSunday(d) { return new Date(d + 'T00:00:00').getDay() === 0; }
         function isSaturday(d) { return new Date(d + 'T00:00:00').getDay() === 6; }
         function isFriday(d) { return new Date(d + 'T00:00:00').getDay() === 5; }
         function isHoliday(d) { return CONFIG.HOLIDAYS_2026.includes(d); }
         function getMinDate() { const d = new Date(); d.setDate(d.getDate() + CONFIG.MIN_BOOKING_DAYS); return d.toISOString().split('T')[0]; }
         function getMaxDate() { const d = new Date(); d.setDate(d.getDate() + CONFIG.MAX_BOOKING_DAYS); return d.toISOString().split('T')[0]; }
+        function doToast(msg, type) { alert(`${type.toUpperCase()}: ${msg}`); }
 
-        function doToast(msg, type = 'info') {
-            alert(`${type.toUpperCase()}: ${msg}`);
-        }
-
-        // ========== System Lock Check ==========
         function checkSystemLock(bookingData = null) {
             const now = new Date();
             const currentHours = now.getHours() + now.getMinutes() / 60;
             const userRole = currentUser?.role || 'regular';
             const canOverride = CONFIG.OVERRIDE_ROLES.includes(userRole);
-
             const lockStatus = { isLocked: false, reason: null, canOverride, isFridayPrayerBlock: false };
-
             if (currentHours > CONFIG.WORK_HOURS.end && !canOverride) {
                 lockStatus.isLocked = true;
                 lockStatus.reason = `Sistem booking tutup setelah jam ${decimalToTime(CONFIG.WORK_HOURS.end)}. Untuk booking malam/weekend, hubungi Kabag Umum atau Koord Umum.`;
@@ -212,11 +193,7 @@ export default {
             if (!overlay) {
                 overlay = document.createElement('div');
                 overlay.id = 'booking-lock-overlay';
-                overlay.style.cssText = `
-                    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-                    background: rgba(0,0,0,0.9); display: none;
-                    align-items: center; justify-content: center; z-index: 9999;
-                `;
+                overlay.style.cssText = 'position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); display:none; align-items:center; justify-content:center; z-index:9999;';
                 overlay.innerHTML = `
                     <div style="background:#1e293b; padding:2rem; border-radius:16px; text-align:center; max-width:500px; border:2px solid #f59e0b;">
                         <div style="font-size:3rem; margin-bottom:1rem;">🔒</div>
@@ -224,18 +201,11 @@ export default {
                         <p id="lock-reason" style="margin-bottom:1.5rem; color:#e2e8f0;"></p>
                         ${canOverride ? `
                             <div style="background:rgba(59,130,246,0.1); padding:1rem; border-radius:8px; margin-bottom:1rem;">
-                                <p style="font-size:0.85rem; color:#93c5fd;">
-                                    <strong>Anda memiliki akses override.</strong><br>
-                                    Klik "Lanjut" untuk booking dengan persetujuan khusus.
-                                </p>
+                                <p style="font-size:0.85rem; color:#93c5fd;"><strong>Anda memiliki akses override.</strong><br>Klik "Lanjut" untuk booking dengan persetujuan khusus.</p>
                             </div>
-                            <button id="lock-override" style="background:#3b82f6; color:white; padding:0.75rem 2rem; border:none; border-radius:8px; font-weight:700; cursor:pointer; margin-right:0.5rem;">
-                                Lanjut (Override)
-                            </button>
+                            <button id="lock-override" style="background:#3b82f6; color:white; padding:0.75rem 2rem; border:none; border-radius:8px; font-weight:700; cursor:pointer; margin-right:0.5rem;">Lanjut (Override)</button>
                         ` : ''}
-                        <button id="lock-close" style="background:#64748b; color:white; padding:0.75rem 2rem; border:none; border-radius:8px; font-weight:700; cursor:pointer;">
-                            ${canOverride ? 'Batal' : 'Mengerti'}
-                        </button>
+                        <button id="lock-close" style="background:#64748b; color:white; padding:0.75rem 2rem; border:none; border-radius:8px; font-weight:700; cursor:pointer;">${canOverride ? 'Batal' : 'Mengerti'}</button>
                     </div>
                 `;
                 document.body.appendChild(overlay);
@@ -253,35 +223,27 @@ export default {
             overlay.style.display = 'flex';
         }
 
-        // ========== Validation ==========
         function validateBooking(data) {
             const errors = [], warnings = [];
             const selectedDate = new Date(data.tgl + 'T00:00:00');
-            const today = new Date(); today.setHours(0, 0, 0, 0);
-
+            const today = new Date(); today.setHours(0,0,0,0);
             if (selectedDate < today) errors.push('Tanggal tidak boleh di masa lalu!');
             if (isSunday(data.tgl)) errors.push('❌ Hari Minggu LIBUR!');
             if (isHoliday(data.tgl)) errors.push('❌ Tanggal merah LIBUR!');
             if (isSaturday(data.tgl)) warnings.push('⚠️ Sabtu hanya untuk team umum (perlu approval)');
-
             const mulai = timeToDecimal(data.jam_mulai), selesai = timeToDecimal(data.jam_selesai);
             if (mulai < CONFIG.WORK_HOURS.start) errors.push(`Jam mulai minimal ${decimalToTime(CONFIG.WORK_HOURS.start)}`);
             if (selesai > CONFIG.WORK_HOURS.end) errors.push(`Jam selesai maksimal ${decimalToTime(CONFIG.WORK_HOURS.end)}`);
             if (selesai <= mulai) errors.push('Jam selesai harus > jam mulai!');
-
             if (isFriday(data.tgl) && CONFIG.FRIDAY_BLOCKED_ROOMS.includes(data.sarana)) {
                 const prayerStart = CONFIG.FRIDAY_PRAYER_BLOCK.start;
                 const prayerEnd = CONFIG.FRIDAY_PRAYER_BLOCK.end;
-                if (mulai < prayerEnd && selesai > prayerStart) {
-                    errors.push(`❌ ${data.sarana} tidak tersedia Jumat ${decimalToTime(prayerStart)}-${decimalToTime(prayerEnd)} untuk Shalat Jumat`);
-                }
+                if (mulai < prayerEnd && selesai > prayerStart) errors.push(`❌ ${data.sarana} tidak tersedia Jumat ${decimalToTime(prayerStart)}-${decimalToTime(prayerEnd)} untuk Shalat Jumat`);
             }
-
             if (data.sarana === 'Masjid (Maintenance)') errors.push('❌ Masjid sedang maintenance!');
             return { errors, warnings };
         }
 
-        // ========== Double Booking Check ==========
         async function checkDoubleBooking(data) {
             if (!supabase) return { hasConflict: false };
             try {
@@ -292,32 +254,21 @@ export default {
                     .eq('tanggal', data.tgl)
                     .eq('status', 'approved');
                 if (error) throw error;
-
                 const mulai = timeToDecimal(data.jam_mulai), selesai = timeToDecimal(data.jam_selesai);
                 const conflict = existing?.find(b => {
                     const bMulai = timeToDecimal(b.jam_mulai), bSelesai = timeToDecimal(b.jam_selesai);
                     return mulai < bSelesai && selesai > bMulai;
                 });
-                if (conflict) return {
-                    hasConflict: true,
-                    message: `❌ BENTROK! ${data.sarana} sudah di-booking ${conflict.nama_peminjam}`
-                };
+                if (conflict) return { hasConflict: true, message: `❌ BENTROK! ${data.sarana} sudah di-booking ${conflict.nama_peminjam}` };
                 return { hasConflict: false };
-            } catch (err) {
-                console.warn('⚠️ Double check failed:', err.message);
-                return { hasConflict: false };
-            }
+            } catch (err) { return { hasConflict: false }; }
         }
 
-        // ========== Audit Log ==========
         async function writeAuditLog(action, detail, user) {
             if (!supabase) return;
-            try {
-                await supabase.from('audit_logs').insert([{ action, detail, user, created_at: new Date().toISOString() }]);
-            } catch (err) { console.warn('[Booking] audit_log gagal:', err.message); }
+            try { await supabase.from('audit_logs').insert([{ action, detail, user, created_at: new Date().toISOString() }]); } catch(e) {}
         }
 
-        // ========== Notifications ==========
         async function loadNotifications() {
             if (!supabase) return [];
             try {
@@ -333,22 +284,13 @@ export default {
                     .order('jam_mulai', { ascending: true });
                 if (error) throw error;
                 return bookings?.map(b => ({ ...b, isToday: b.tanggal === today, isTomorrow: b.tanggal === tomorrowStr })) || [];
-            } catch (err) {
-                console.warn('[Booking] Load notifications error:', err);
-                return [];
-            }
+            } catch(e) { return []; }
         }
 
         function showNotificationPanel(notifications) {
             const panel = document.createElement('div');
             panel.id = 'booking-notification-panel';
-            panel.style.cssText = `
-                position: fixed; top: 20px; right: 20px; max-width: 400px; max-height: 60vh;
-                overflow-y: auto; background: rgba(15, 23, 42, 0.95);
-                border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 16px;
-                padding: 1.5rem; z-index: 1000; box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-                backdrop-filter: blur(10px);
-            `;
+            panel.style.cssText = 'position:fixed; top:20px; right:20px; max-width:400px; max-height:60vh; overflow-y:auto; background:rgba(15,23,42,0.95); border:1px solid rgba(59,130,246,0.3); border-radius:16px; padding:1.5rem; z-index:1000; box-shadow:0 10px 40px rgba(0,0,0,0.4); backdrop-filter:blur(10px);';
             const todayBookings = notifications.filter(n => n.isToday);
             const tomorrowBookings = notifications.filter(n => n.isTomorrow);
             panel.innerHTML = `
@@ -356,76 +298,24 @@ export default {
                     <h3 style="color:#3b82f6; font-size:1.1rem; font-weight:700;">🔔 Reminder Booking</h3>
                     <button onclick="this.closest('#booking-notification-panel').remove()" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:1.2rem;">✕</button>
                 </div>
-                ${todayBookings.length > 0 ? `
-                    <div style="margin-bottom:1rem;">
-                        <div style="background:rgba(16,185,129,0.1); border-left:3px solid #10b981; padding:0.75rem; border-radius:8px; margin-bottom:0.5rem;">
-                            <div style="color:#10b981; font-weight:700; font-size:0.85rem; margin-bottom:0.25rem;">📅 HARI INI (${todayBookings.length} booking)</div>
-                            ${todayBookings.map(b => `
-                                <div style="background:rgba(0,0,0,0.2); padding:0.5rem; border-radius:6px; margin-top:0.5rem; font-size:0.85rem;">
-                                    <div style="font-weight:600; color:#e2e8f0;">${b.ruang}</div>
-                                    <div style="color:#94a3b8; font-size:0.75rem;">${b.jam_mulai} - ${b.jam_selesai} | ${b.nama_peminjam}</div>
-                                    ${b.peralatan ? `<div style="color:#64748b; font-size:0.7rem; margin-top:0.25rem;">🔧 ${b.peralatan}</div>` : ''}
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                ` : ''}
-                ${tomorrowBookings.length > 0 ? `
-                    <div>
-                        <div style="background:rgba(245,158,11,0.1); border-left:3px solid #f59e0b; padding:0.75rem; border-radius:8px;">
-                            <div style="color:#f59e0b; font-weight:700; font-size:0.85rem; margin-bottom:0.25rem;">⏰ BESOK (${tomorrowBookings.length} booking)</div>
-                            ${tomorrowBookings.map(b => `
-                                <div style="background:rgba(0,0,0,0.2); padding:0.5rem; border-radius:6px; margin-top:0.5rem; font-size:0.85rem;">
-                                    <div style="font-weight:600; color:#e2e8f0;">${b.ruang}</div>
-                                    <div style="color:#94a3b8; font-size:0.75rem;">${b.jam_mulai} - ${b.jam_selesai} | ${b.nama_peminjam}</div>
-                                    ${b.peralatan ? `<div style="color:#64748b; font-size:0.7rem; margin-top:0.25rem;">🔧 ${b.peralatan}</div>` : ''}
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                ` : ''}
-                ${notifications.length === 0 ? `
-                    <div style="text-align:center; padding:2rem; color:#64748b;">
-                        <div style="font-size:2rem; margin-bottom:0.5rem;">📭</div>
-                        <div style="font-size:0.85rem;">Tidak ada booking hari ini/besok</div>
-                    </div>
-                ` : ''}
+                ${todayBookings.length ? `<div style="margin-bottom:1rem;"><div style="background:rgba(16,185,129,0.1); border-left:3px solid #10b981; padding:0.75rem; border-radius:8px;"><div style="color:#10b981; font-weight:700;">📅 HARI INI (${todayBookings.length} booking)</div>${todayBookings.map(b => `<div style="background:rgba(0,0,0,0.2); padding:0.5rem; border-radius:6px; margin-top:0.5rem;"><div style="font-weight:600;">${b.ruang}</div><div>${b.jam_mulai} - ${b.jam_selesai} | ${b.nama_peminjam}</div>${b.peralatan ? `<div>🔧 ${b.peralatan}</div>` : ''}</div>`).join('')}</div></div>` : ''}
+                ${tomorrowBookings.length ? `<div><div style="background:rgba(245,158,11,0.1); border-left:3px solid #f59e0b; padding:0.75rem; border-radius:8px;"><div style="color:#f59e0b; font-weight:700;">⏰ BESOK (${tomorrowBookings.length} booking)</div>${tomorrowBookings.map(b => `<div style="background:rgba(0,0,0,0.2); padding:0.5rem; border-radius:6px; margin-top:0.5rem;"><div style="font-weight:600;">${b.ruang}</div><div>${b.jam_mulai} - ${b.jam_selesai} | ${b.nama_peminjam}</div>${b.peralatan ? `<div>🔧 ${b.peralatan}</div>` : ''}</div>`).join('')}</div></div>` : ''}
+                ${!notifications.length ? `<div style="text-align:center; padding:2rem; color:#64748b;"><div>📭</div><div>Tidak ada booking hari ini/besok</div></div>` : ''}
             `;
             document.body.appendChild(panel);
             setTimeout(() => {
-                if (panel?.parentNode) {
-                    panel.style.transition = 'opacity 0.5s, transform 0.5s';
-                    panel.style.opacity = '0';
-                    panel.style.transform = 'translateX(20px)';
-                    setTimeout(() => panel.remove(), 500);
-                }
+                if (panel?.parentNode) { panel.style.transition = 'opacity 0.5s'; panel.style.opacity = '0'; setTimeout(() => panel.remove(), 500); }
             }, 30000);
         }
 
-        // ========== Populate Dynamic Content ==========
+        // Populate dynamic content
         const saranaSelect = document.getElementById('sarana');
-        if (saranaSelect) {
-            saranaSelect.innerHTML = '<option value="">-- Pilih Sarana --</option>' +
-                CONFIG.SARANA_LIST.map(s => `<option value="${s}">${s}</option>`).join('');
-        }
+        if (saranaSelect) saranaSelect.innerHTML = '<option value="">-- Pilih Sarana --</option>' + CONFIG.SARANA_LIST.map(s => `<option value="${s}">${s}</option>`).join('');
         const peralatanDiv = document.getElementById('peralatan-list');
-        if (peralatanDiv) {
-            peralatanDiv.innerHTML = CONFIG.PERALATAN_LIST.map(alat => `
-                <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-800 p-2 rounded-lg transition">
-                    <input type="checkbox" name="alat" value="${alat}" class="w-4 h-4 rounded border-slate-600 text-emerald-500 focus:ring-emerald-500">
-                    <span class="text-sm text-slate-300">${alat}</span>
-                </label>
-            `).join('');
-        }
-
+        if (peralatanDiv) peralatanDiv.innerHTML = CONFIG.PERALATAN_LIST.map(alat => `<label class="flex items-center gap-2 cursor-pointer hover:bg-slate-800 p-2 rounded-lg transition"><input type="checkbox" name="alat" value="${alat}" class="w-4 h-4 rounded border-slate-600 text-emerald-500"><span class="text-sm text-slate-300">${alat}</span></label>`).join('');
         const tglInput = document.getElementById('tgl');
-        if (tglInput) {
-            tglInput.min = getMinDate();
-            tglInput.max = getMaxDate();
-            tglInput.value = getMinDate();
-        }
+        if (tglInput) { tglInput.min = getMinDate(); tglInput.max = getMaxDate(); tglInput.value = getMinDate(); }
 
-        // ========== Event Handlers ==========
         const form = document.getElementById('bookingForm');
         const submitBtn = document.getElementById('submitBtn');
         const notifBtn = document.getElementById('booking-notif-btn');
@@ -434,151 +324,70 @@ export default {
         const lockAlertMsg = document.getElementById('lock-alert-message');
         const dateWarning = document.getElementById('dateWarning');
 
-        // Initial lock check
         const lockStatus = checkSystemLock();
         if (lockStatus.isLocked) {
-            if (lockAlert && lockAlertMsg) {
-                lockAlert.classList.remove('hidden');
-                lockAlertMsg.textContent = lockStatus.reason;
-            }
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '🔒 Sistem Ditutup';
-            }
-            if (!lockStatus.canOverride || lockStatus.isFridayPrayerBlock) {
-                showLockOverlay(lockStatus.reason, lockStatus.canOverride);
-            }
+            if (lockAlert && lockAlertMsg) { lockAlert.classList.remove('hidden'); lockAlertMsg.textContent = lockStatus.reason; }
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '🔒 Sistem Ditutup'; }
+            if (!lockStatus.canOverride || lockStatus.isFridayPrayerBlock) showLockOverlay(lockStatus.reason, lockStatus.canOverride);
         }
 
-        // Load notifications
         const notifications = await loadNotifications();
-        if (notifications.length > 0 && notifBadge) {
-            notifBadge.textContent = notifications.length;
-            notifBadge.style.display = 'flex';
-            setTimeout(() => showNotificationPanel(notifications), 1000);
-        } else if (notifBadge) {
-            notifBadge.style.display = 'none';
-        }
+        if (notifications.length && notifBadge) { notifBadge.textContent = notifications.length; notifBadge.style.display = 'flex'; setTimeout(() => showNotificationPanel(notifications), 1000); }
+        else if (notifBadge) notifBadge.style.display = 'none';
+        if (notifBtn) notifBtn.onclick = async () => { const n = await loadNotifications(); showNotificationPanel(n); };
 
-        if (notifBtn) {
-            notifBtn.onclick = async () => {
-                const notifs = await loadNotifications();
-                showNotificationPanel(notifs);
-            };
-        }
-
-        // Date change handler
         if (tglInput) {
             tglInput.addEventListener('change', (e) => {
-                const dateStr = e.target.value;
-                const dayName = getDayName(dateStr);
-                if (isSunday(dateStr) || isHoliday(dateStr)) {
-                    dateWarning.classList.remove('hidden');
-                    dateWarning.querySelector('span').textContent = `${dayName} - LIBUR!`;
-                    dateWarning.className = 'text-xs text-red-400 mt-1';
-                } else if (isSaturday(dateStr)) {
-                    dateWarning.classList.remove('hidden');
-                    dateWarning.querySelector('span').textContent = `${dayName} - Optional`;
-                    dateWarning.className = 'text-xs text-orange-400 mt-1';
-                } else if (isFriday(dateStr)) {
-                    dateWarning.classList.remove('hidden');
-                    dateWarning.querySelector('span').textContent = `${dayName} - Jumat Berkah!`;
-                    dateWarning.className = 'text-xs text-blue-400 mt-1';
-                } else {
-                    dateWarning.classList.add('hidden');
-                }
+                const ds = e.target.value, dn = getDayName(ds);
+                if (isSunday(ds) || isHoliday(ds)) { dateWarning.classList.remove('hidden'); dateWarning.querySelector('span').textContent = `${dn} - LIBUR!`; dateWarning.className = 'text-xs text-red-400 mt-1'; }
+                else if (isSaturday(ds)) { dateWarning.classList.remove('hidden'); dateWarning.querySelector('span').textContent = `${dn} - Optional`; dateWarning.className = 'text-xs text-orange-400 mt-1'; }
+                else if (isFriday(ds)) { dateWarning.classList.remove('hidden'); dateWarning.querySelector('span').textContent = `${dn} - Jumat Berkah!`; dateWarning.className = 'text-xs text-blue-400 mt-1'; }
+                else dateWarning.classList.add('hidden');
             });
         }
 
-        // Real‑time Friday prayer block check
-        ['sarana', 'tgl', 'jam_mulai', 'jam_selesai'].forEach(id => {
+        ['sarana','tgl','jam_mulai','jam_selesai'].forEach(id => {
             const el = document.getElementById(id);
-            if (el) {
-                el.addEventListener('change', () => {
-                    const formData = {
-                        sarana: document.getElementById('sarana')?.value,
-                        tgl: document.getElementById('tgl')?.value,
-                        jam_mulai: document.getElementById('jam_mulai')?.value,
-                        jam_selesai: document.getElementById('jam_selesai')?.value
-                    };
-                    if (formData.sarana && formData.tgl && formData.jam_mulai && formData.jam_selesai) {
-                        const lockCheck = checkSystemLock(formData);
-                        if (lockCheck.isFridayPrayerBlock && lockAlert && lockAlertMsg) {
-                            lockAlert.classList.remove('hidden');
-                            lockAlertMsg.textContent = lockCheck.reason;
-                            lockAlert.style.borderColor = '#f59e0b';
-                        } else if (lockAlert) {
-                            lockAlert.classList.add('hidden');
-                        }
-                    }
-                });
-            }
+            if (el) el.addEventListener('change', () => {
+                const fd = { sarana: document.getElementById('sarana')?.value, tgl: document.getElementById('tgl')?.value, jam_mulai: document.getElementById('jam_mulai')?.value, jam_selesai: document.getElementById('jam_selesai')?.value };
+                if (fd.sarana && fd.tgl && fd.jam_mulai && fd.jam_selesai) {
+                    const lc = checkSystemLock(fd);
+                    if (lc.isFridayPrayerBlock && lockAlert && lockAlertMsg) { lockAlert.classList.remove('hidden'); lockAlertMsg.textContent = lc.reason; lockAlert.style.borderColor = '#f59e0b'; }
+                    else if (lockAlert) lockAlert.classList.add('hidden');
+                }
+            });
         });
 
-        // Form submission
         if (form) {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const isOverride = form.dataset.override === 'true';
-                const formData = new FormData(e.target);
-                const alatList = formData.getAll('alat');
+                const fd = new FormData(e.target);
+                const alatList = fd.getAll('alat');
                 const data = {
-                    nama: formData.get('nama'),
-                    divisi: formData.get('divisi'),
-                    no_hp: formData.get('no_hp'),
-                    sarana: formData.get('sarana'),
-                    tgl: formData.get('tgl'),
-                    jam_mulai: formData.get('jam_mulai'),
-                    jam_selesai: formData.get('jam_selesai'),
-                    peralatan: alatList.join(', '),
-                    keperluan: formData.get('keperluan')
+                    nama: fd.get('nama'), divisi: fd.get('divisi'), no_hp: fd.get('no_hp'),
+                    sarana: fd.get('sarana'), tgl: fd.get('tgl'), jam_mulai: fd.get('jam_mulai'), jam_selesai: fd.get('jam_selesai'),
+                    peralatan: alatList.join(', '), keperluan: fd.get('keperluan')
                 };
-
-                const lockCheck = checkSystemLock(data);
-                if (lockCheck.isLocked && !isOverride && !lockCheck.canOverride) {
-                    doToast(lockCheck.reason, 'error');
-                    showLockOverlay(lockCheck.reason, false);
-                    return;
-                }
-
-                const validation = validateBooking(data);
-                if (validation.warnings.length) validation.warnings.forEach(w => doToast(w, 'warning'));
-                if (validation.errors.length) { validation.errors.forEach(err => doToast(err, 'error')); return; }
-
+                const lc = checkSystemLock(data);
+                if (lc.isLocked && !isOverride && !lc.canOverride) { doToast(lc.reason, 'error'); showLockOverlay(lc.reason, false); return; }
+                const val = validateBooking(data);
+                if (val.warnings.length) val.warnings.forEach(w => doToast(w, 'warning'));
+                if (val.errors.length) { val.errors.forEach(e => doToast(e, 'error')); return; }
                 doToast('🔍 Mengecek ketersediaan...', 'info');
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Checking...';
-                }
-
+                if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Checking...'; }
                 const doubleCheck = await checkDoubleBooking(data);
-                if (doubleCheck.hasConflict) {
-                    doToast(doubleCheck.message, 'error');
-                    if (submitBtn) {
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> AJUKAN BOOKING';
-                    }
-                    return;
-                }
-
+                if (doubleCheck.hasConflict) { doToast(doubleCheck.message, 'error'); if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> AJUKAN BOOKING'; } return; }
                 try {
                     if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...';
                     const payload = {
-                        nama_peminjam: data.nama,
-                        divisi: data.divisi || null,
-                        no_hp: data.no_hp,
-                        ruang: data.sarana,
-                        tanggal: data.tgl,
-                        jam_mulai: data.jam_mulai,
-                        jam_selesai: data.jam_selesai,
-                        keperluan: data.keperluan || null,
-                        peralatan: data.peralatan,
-                        status: isOverride || lockCheck.canOverride ? 'pending' : 'approved',
-                        requires_approval: isOverride || lockCheck.canOverride,
-                        created_at: new Date().toISOString(),
-                        created_by: currentUser?.name || 'Unknown'
+                        nama_peminjam: data.nama, divisi: data.divisi || null, no_hp: data.no_hp, ruang: data.sarana,
+                        tanggal: data.tgl, jam_mulai: data.jam_mulai, jam_selesai: data.jam_selesai,
+                        keperluan: data.keperluan || null, peralatan: data.peralatan,
+                        status: isOverride || lc.canOverride ? 'pending' : 'approved',
+                        requires_approval: isOverride || lc.canOverride,
+                        created_at: new Date().toISOString(), created_by: currentUser?.name || 'Unknown'
                     };
-
                     if (supabase) {
                         const { error } = await supabase.from('bookings').insert(payload);
                         if (error) throw error;
@@ -588,28 +397,12 @@ export default {
                         existing.push({ ...payload, id: Date.now() });
                         localStorage.setItem('bookings', JSON.stringify(existing));
                     }
-
                     doToast('✅ Booking berhasil! Menunggu approval.', 'success');
-                    form.reset()
-                    if (tglInput) tglInput.value = getMinDate();
-                    if (dateWarning) dateWarning.classList.add('hidden');
-                    delete form.dataset.override;
-
-                    const notifs = await loadNotifications();
-                    if (notifBadge && notifs.length > 0) {
-                        notifBadge.textContent = notifs.length;
-                        notifBadge.style.display = 'flex';
-                    }
-                } catch (err) {
-                    doToast('❌ Gagal: ' + err.message, 'error');
-                } finally {
-                    if (submitBtn) {
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> AJUKAN BOOKING';
-                    }
-                }
+                    form.reset(); if (tglInput) tglInput.value = getMinDate(); if (dateWarning) dateWarning.classList.add('hidden'); delete form.dataset.override;
+                    const n = await loadNotifications(); if (notifBadge && n.length) { notifBadge.textContent = n.length; notifBadge.style.display = 'flex'; }
+                } catch (err) { doToast('❌ Gagal: ' + err.message, 'error'); }
+                finally { if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> AJUKAN BOOKING'; } }
             });
         }
     }
-};
 };
