@@ -47,6 +47,7 @@ export default {
             try {
                 const reply = await callAI(msg);
                 log.lastChild.remove();
+
                 addMessage(reply, false);
             } catch (err) {
                 log.lastChild.remove();
