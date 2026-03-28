@@ -1,4 +1,4 @@
-lexport default {
+export default {
     render: () => {
         return `
             <div style="padding:20px; background:#0f172a; border-radius:12px;">
@@ -55,4 +55,3 @@ lexport default {
         };
     }
 };
-
