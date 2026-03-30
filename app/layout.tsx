@@ -1,3 +1,4 @@
+import { NeuralProvider } from "@/context/NeuralContext";
 import type { Metadata } from "next";
 import { Inter, Amiri } from "next/font/google";
 import "./globals.css";
