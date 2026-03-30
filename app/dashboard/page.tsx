@@ -10,6 +10,7 @@ export default function DashboardPage() {
   const [showAI, setShowAI] = useState(false);
   const [aiMessages, setAiMessages] = useState<{role: string, text: string}[]>([]);
   const [aiInput, setAiInput] = useState('');
+  const [activeNav, setActiveNav] = useState('home');
 
   const slides = [
     { title: '👋 Say Greeting', icon: '👋', content: 'Selamat Datang\nDream OS v2.1' },
@@ -20,23 +21,23 @@ export default function DashboardPage() {
     { title: '🏢 Info Umum', icon: '🏢', content: 'Info Umum\n3 Tasks Today' },
     { title: '💬 Ucapan', icon: '💬', content: 'Ucapan Kabar\nBirthday: Bapak Hanung' },
   ];
+
   const modules = [
-    { name: 'Command', icon: '🎯', color: '#8b5cf6', path: '/dashboard' },
-    { name: 'Booking', icon: '📅', color: '#3b82f6', path: '/dashboard' },
-    { name: 'K3', icon: '⚠️', color: '#f59e0b', path: '/modules/k3' },
-    { name: 'Security', icon: '🛡️', color: '#10b981', path: '/dashboard' },
-    { name: 'Janitor', icon: '🧹', color: '#ec4899', path: '/dashboard' },
-    { name: 'Stok', icon: '📦', color: '#f97316', path: '/dashboard' },
-    { name: 'Maintenance', icon: '🔧', color: '#06b6d4', path: '/dashboard' },
-    { name: 'Inventaris', icon: '📋', color: '#6366f1', path: '/dashboard' },
-    { name: 'TinyGo', icon: '🚀', color: '#84cc16', path: '/modules/tinygo' },
+    { name: 'Command', icon: '🎯', color: '#8b5cf6' },
+    { name: 'Booking', icon: '📅', color: '#3b82f6' },
+    { name: 'K3', icon: '⚠️', color: '#f59e0b' },
+    { name: 'Security', icon: '🛡️', color: '#10b981' },
+    { name: 'Janitor', icon: '🧹', color: '#ec4899' },
+    { name: 'Stok', icon: '📦', color: '#f97316' },
+    { name: 'Maintenance', icon: '🔧', color: '#06b6d4' },
+    { name: 'Inventaris', icon: '📋', color: '#6366f1' },
+    { name: 'TinyGo', icon: '🚀', color: '#84cc16' },
   ];
 
   useEffect(() => {
     const session = sessionStorage.getItem('dream_session');
     const sessionUser = sessionStorage.getItem('dream_user');
-    if (!session) {
-      router.push('/login');
+    if (!session) {      router.push('/login');
     } else if (sessionUser) {
       setUser(sessionUser);
     }
@@ -49,6 +50,22 @@ export default function DashboardPage() {
     return () => clearInterval(timer);
   }, [slides.length]);
 
+  // ✅ NAVIGATION HANDLER
+  const handleNav = (page: string) => {
+    setActiveNav(page);
+    if (page === 'home') {
+      // Stay on dashboard
+    } else if (page === 'profile') {
+      alert('👤 Profile Page\n\nUser: ' + user + '\n\nFeature coming soon!');
+    } else if (page === 'qr') {
+      alert('📷 QR Scanner\n\nFeature coming soon!');
+    } else if (page === 'alerts') {
+      alert('🔔 Notifications\n\nNo new alerts!');
+    } else if (page === 'settings') {
+      alert('⚙️ Settings\n\nFeature coming soon!');
+    }
+  };
+
   const handleAIMessage = () => {
     if (!aiInput.trim()) return;
     setAiMessages([...aiMessages, { role: 'user', text: aiInput }]);
@@ -58,10 +75,18 @@ export default function DashboardPage() {
     }, 1000);
   };
 
+  let ghostTapCount = 0;
+  let ghostLastTap = 0;
   const handleGhostTap = () => {
-    alert('👻 GHOST MODE\n\n5x Tap detected!\n\nEnter password: dreamos[rakaat]');
+    const now = Date.now();
+    if (now - ghostLastTap > 800) ghostTapCount = 0;
+    ghostTapCount++;
+    ghostLastTap = now;
+    if (ghostTapCount >= 5) {
+      alert('👻 GHOST MODE\n\n5x Tap detected!\n\nEnter password: dreamos[rakaat]');
+      ghostTapCount = 0;
+    }
   };
-
   return (
     <div style={{ minHeight: '100vh', background: '#020617', color: 'white', paddingBottom: '100px' }}>
       {/* Header */}
@@ -69,7 +94,8 @@ export default function DashboardPage() {
         <div style={{ fontFamily: 'serif', fontSize: '32px', color: '#10b981', marginBottom: '5px', textAlign: 'center', cursor: 'pointer' }} onClick={handleGhostTap}>بِسْمِ اللَّهِ</div>
         <div style={{ fontFamily: 'serif', fontSize: '16px', color: 'rgba(16,185,129,0.7)', textAlign: 'center', marginBottom: '10px', cursor: 'pointer' }} onClick={handleGhostTap}>اللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ</div>
         <div style={{ fontSize: '14px', color: '#10b981', letterSpacing: '2px', textTransform: 'uppercase', textAlign: 'center' }}>DREAM OS V2.1</div>
-        <div style={{ fontSize: '10px', color: 'rgba(148,163,184,0.7)', textAlign: 'center', marginTop: '5px' }}>Welcome, {user}</div>        <div onClick={handleGhostTap} style={{ position: 'fixed', top: '15px', right: '15px', background: 'rgba(16,185,129,0.2)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', padding: '6px 12px', borderRadius: '20px', fontSize: '9px', fontWeight: '700', cursor: 'pointer', zIndex: 101 }}>👻 Ghost</div>
+        <div style={{ fontSize: '10px', color: 'rgba(148,163,184,0.7)', textAlign: 'center', marginTop: '5px' }}>Welcome, {user}</div>
+        <div onClick={handleGhostTap} style={{ position: 'fixed', top: '15px', right: '15px', background: 'rgba(16,185,129,0.2)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', padding: '6px 12px', borderRadius: '20px', fontSize: '9px', fontWeight: '700', cursor: 'pointer', zIndex: 101 }}>👻 Ghost</div>
       </header>
 
       {/* Carousel */}
@@ -109,8 +135,7 @@ export default function DashboardPage() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(2,6,23,0.9)', zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ background: '#0f172a', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '20px', width: '90%', maxWidth: '500px', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '20px', borderBottom: '1px solid rgba(16,185,129,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ color: '#10b981', margin: 0, fontSize: '16px' }}>🤖 Baby AI Assistant</h3>
-              <button onClick={() => setShowAI(false)} style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '20px', cursor: 'pointer' }}>✕</button>
+              <h3 style={{ color: '#10b981', margin: 0, fontSize: '16px' }}>🤖 Baby AI Assistant</h3>              <button onClick={() => setShowAI(false)} style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '20px', cursor: 'pointer' }}>✕</button>
             </div>
             <div style={{ flex: 1, overflowY: 'auto', padding: '20px', maxHeight: '400px' }}>
               {aiMessages.length === 0 && <div style={{ color: 'rgba(148,163,184,0.7)', textAlign: 'center' }}>Assalamualaikum! Saya Baby AI Assistant. Ada yang bisa saya bantu? 🤖</div>}
@@ -118,7 +143,8 @@ export default function DashboardPage() {
                 <div key={i} style={{ marginBottom: '15px', padding: '12px 16px', borderRadius: '12px', maxWidth: '80%', background: msg.role === 'ai' ? 'rgba(16,185,129,0.1)' : 'rgba(59,130,246,0.2)', marginLeft: msg.role === 'user' ? 'auto' : '0' }}>
                   <span style={{ color: msg.role === 'ai' ? '#10b981' : '#3b82f6', fontSize: '10px', fontWeight: '700' }}>{msg.role === 'ai' ? '🤖 AI' : '👤 YOU'}</span>
                   <p style={{ color: '#e2e8f0', fontSize: '13px', marginTop: '5px' }}>{msg.text}</p>
-                </div>              ))}
+                </div>
+              ))}
             </div>
             <div style={{ padding: '20px', borderTop: '1px solid rgba(16,185,129,0.2)', display: 'flex', gap: '10px' }}>
               <input type="text" value={aiInput} onChange={(e) => setAiInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleAIMessage()} placeholder="Tanya sesuatu..." style={{ flex: 1, background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '12px', padding: '12px', color: '#e2e8f0', outline: 'none' }} />
@@ -128,13 +154,28 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Bottom Navigation */}
+      {/* ✅ Bottom Navigation - WORKING! */}
       <nav style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: '480px', height: '70px', background: 'rgba(2,6,23,0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(16,185,129,0.2)', display: 'flex', justifyContent: 'space-around', alignItems: 'center', zIndex: 1000 }}>
-        <button style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#10b981', background: 'none', border: 'none', fontSize: '9px' }}><span style={{ fontSize: '20px', marginBottom: '4px' }}>🏠</span><span>Home</span></button>
-        <button onClick={() => router.push('/dashboard')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'rgba(148,163,184,0.8)', background: 'none', border: 'none', fontSize: '9px' }}><span style={{ fontSize: '20px', marginBottom: '4px' }}>👤</span><span>Profile</span></button>
-        <button style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'rgba(148,163,184,0.8)', background: 'none', border: 'none', fontSize: '9px' }}><span style={{ fontSize: '20px', marginBottom: '4px' }}>📷</span><span>QR</span></button>
-        <button style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'rgba(148,163,184,0.8)', background: 'none', border: 'none', fontSize: '9px' }}><span style={{ fontSize: '20px', marginBottom: '4px' }}>🔔</span><span>Alerts</span></button>
-        <button style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'rgba(148,163,184,0.8)', background: 'none', border: 'none', fontSize: '9px' }}><span style={{ fontSize: '20px', marginBottom: '4px' }}>⚙️</span><span>Settings</span></button>
+        <button onClick={() => handleNav('home')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: activeNav === 'home' ? '#10b981' : 'rgba(148,163,184,0.8)', background: activeNav === 'home' ? 'rgba(16,185,129,0.1)' : 'none', border: 'none', fontSize: '9px', padding: '8px 12px', borderRadius: '12px', cursor: 'pointer' }}>
+          <span style={{ fontSize: '20px', marginBottom: '4px' }}>🏠</span>
+          <span>Home</span>
+        </button>
+        <button onClick={() => handleNav('profile')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: activeNav === 'profile' ? '#10b981' : 'rgba(148,163,184,0.8)', background: activeNav === 'profile' ? 'rgba(16,185,129,0.1)' : 'none', border: 'none', fontSize: '9px', padding: '8px 12px', borderRadius: '12px', cursor: 'pointer' }}>
+          <span style={{ fontSize: '20px', marginBottom: '4px' }}>👤</span>
+          <span>Profile</span>
+        </button>
+        <button onClick={() => handleNav('qr')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: activeNav === 'qr' ? '#10b981' : 'rgba(148,163,184,0.8)', background: activeNav === 'qr' ? 'rgba(16,185,129,0.1)' : 'none', border: 'none', fontSize: '9px', padding: '8px 12px', borderRadius: '12px', cursor: 'pointer' }}>
+          <span style={{ fontSize: '20px', marginBottom: '4px' }}>📷</span>
+          <span>QR</span>
+        </button>
+        <button onClick={() => handleNav('alerts')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: activeNav === 'alerts' ? '#10b981' : 'rgba(148,163,184,0.8)', background: activeNav === 'alerts' ? 'rgba(16,185,129,0.1)' : 'none', border: 'none', fontSize: '9px', padding: '8px 12px', borderRadius: '12px', cursor: 'pointer' }}>
+          <span style={{ fontSize: '20px', marginBottom: '4px' }}>🔔</span>
+          <span>Alerts</span>
+        </button>
+        <button onClick={() => handleNav('settings')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: activeNav === 'settings' ? '#10b981' : 'rgba(148,163,184,0.8)', background: activeNav === 'settings' ? 'rgba(16,185,129,0.1)' : 'none', border: 'none', fontSize: '9px', padding: '8px 12px', borderRadius: '12px', cursor: 'pointer' }}>
+          <span style={{ fontSize: '20px', marginBottom: '4px' }}>⚙️</span>
+          <span>Settings</span>
+        </button>
       </nav>
     </div>
   );
