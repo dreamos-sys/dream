@@ -208,7 +208,7 @@ export default function DashboardPage() {
           <img src="/assets/img/icon-192.png" alt="Dream OS" style={{ width: '80px', height: '80px', borderRadius: '22px', boxShadow: '0 8px 30px rgba(0,0,0,0.15)', marginBottom: '15px' }} />
           <div style={{ fontFamily: 'Amiri, serif', fontSize: '32px', color: '#10b981', marginBottom: '8px' }}>بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
           <div style={{ fontFamily: 'Amiri, serif', fontSize: '18px', color: 'rgba(16,185,129,0.8)', marginBottom: '15px' }}>اللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ</div>
-          <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#1c1c1e', marginBottom: '5px' }}>DREAM OS v14.0 PRO</h1>
+          <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#1c1c1e', marginBottom: '5px' }}>DREAM OS v2.1 PRO PRO</h1>
           <p style={{ fontSize: '14px', color: '#10b981', fontWeight: '600', marginBottom: '5px' }}>
             Global Immunity System Active {tinyGoReady && '🐹'}
           </p>

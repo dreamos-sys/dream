@@ -56,7 +56,7 @@ export default function CommandCenter() {
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
         <Link href="/dashboard" style={{ color: '#10b981', fontWeight: '700', textDecoration: 'none', fontSize: '14px' }}>← BACK</Link>
         <div style={{ background: '#10b981', color: 'white', padding: '8px 16px', borderRadius: '20px', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px' }}>
-          Global CommandCenter v14.0
+          Global CommandCenter v2.1 PRO
         </div>
       </header>
 
@@ -132,7 +132,7 @@ export default function CommandCenter() {
           اللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ
         </div>
         <div style={{ fontSize: '9px', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '2px', marginTop: '8px' }}>
-          Dream OS v14.0 Global Pro · Command Center
+          Dream OS v2.1 PRO Global Pro · Command Center
         </div>
       </footer>
     </div>
