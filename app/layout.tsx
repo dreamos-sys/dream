@@ -28,6 +28,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/assets/img/icon-192.png" sizes="192x192" />
         <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png" />
         <script src="/wasm_exec.js" async></script>
       </head>
       <body className={`${inter.className} ${amiri.className}`}>
