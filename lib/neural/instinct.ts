@@ -1,45 +1,35 @@
 import { store } from '@/lib/data/global-store';
 
 export const NeuralInstinct = {
-  // 🧠 ANALISIS PENALARAN (Reasoning)
   analyzeState: async () => {
     const bookings = store.get('bookings') || [];
     const k3 = store.get('k3Reports') || [];
     const now = new Date();
     const hour = now.getHours();
 
-    console.log("🧠 NEURAL: Reasoning in progress...");
+    // 🧬 Reasoning berbobot
+    let riskScore = 0;
+    if (hour > 17) riskScore += 20; // Resiko lembur
+    if (k3.length > 3) riskScore += 40; // Resiko incident menumpuk
+    if (bookings.length > 10) riskScore += 30; // Resiko over-capacity
 
-    // Prediksi 1: Insting Waktu (Work Habits)
-    if (hour > 16 && bookings.length > 5) {
-      return {
-        type: 'WARNING',
-        msg: "⚠️ Insting: Over-capacity terdeteksi! Banyak booking di luar jam kerja.",
-        action: 'SUGGEST_RESCHEDULE'
-      };
-    }
-
-    // Prediksi 2: Insting Keselamatan (Cross-Module)
-    const leakingReport = k3.find((r: any) => r.description.toLowerCase().includes('bocor'));
-    if (leakingReport && hour > 18) {
+    // Insting dinamis
+    if (riskScore > 70) {
       return {
         type: 'URGENT',
-        msg: "🚨 Insting: Bahaya Korsleting! Ada laporan bocor di malam hari.",
-        action: 'ALERT_MAINTENANCE'
+        msg: `🚨 Insting: System Stress Level ${riskScore}%! Segera koordinasi tim.`,
+        action: 'AUTO_ROUTE_TO_MASTER'
       };
     }
 
-    return { type: 'NORMAL', msg: "✅ Sistem Stabil. Belum ada deviasi pola." };
-  },
+    if (riskScore > 40) {
+      return {
+        type: 'WARNING',
+        msg: "⚠️ Insting: Aktivitas mulai padat. Pantau modul Stok.",
+        action: 'NOTIFY_ADMIN'
+      };
+    }
 
-  // 💾 SMART SAVING (Hanya simpan yang penting)
-  smartRemember: (key: string, data: any) => {
-    const memory = JSON.parse(localStorage.getItem('neural_memory') || '{}');
-    memory[key] = {
-      val: data,
-      timestamp: Date.now(),
-      importance: data.priority === 'high' ? 1.0 : 0.5
-    };
-    localStorage.setItem('neural_memory', JSON.stringify(memory));
+    return { type: 'NORMAL', msg: "✅ Sistem Stabil. Kapasitas Saraf Optimal." };
   }
 };
