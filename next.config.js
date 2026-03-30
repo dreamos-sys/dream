@@ -1,26 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
+  swcMinify: false,
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
-  images: { unoptimized: true },
+  // ⚡ MATIKAN JALUR SARAF WEBPACK SECARA TOTAL
   experimental: {
-    serverComponents: true
+    webpackBuildWorker: false, // INI KUNCINYA!
+    parallelServerBuildTraces: false,
+    workerThreads: false,
+    cpus: 1
   },
-  // PWA Configuration
-  async headers() {
-    return [
-      {
-        source: '/sw.js',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=0, must-revalidate'
-          }
-        ]
-      }
-    ]
+  webpack: (config, { dev, isServer }) => {
+    if (!dev && !isServer) {
+      config.optimization.minimize = false;
+    }
+    return config;
   }
 }
 
