@@ -24,12 +24,15 @@ const modules = [
 
 export const SovereignUniversalGrid = () => {
   const [isTV, setIsTV] = useState(false);
-  useEffect(() => { setIsTV(window.innerWidth / window.innerHeight > 1.2); }, []);
+  useEffect(() => { 
+    setIsTV(window.innerWidth / window.innerHeight > 1.2); 
+  }, []);
+
   return (
     <div className="w-full min-h-screen bg-[#020617] text-white flex flex-col items-center justify-center p-4 md:p-10 font-sans">
       <header className="mb-10 text-center">
         <h1 className="text-3xl md:text-5xl font-black text-[#FFD700] uppercase tracking-[0.2em] drop-shadow-[0_0_15px_rgba(255,215,0,0.5)]">Dream OS v2.1</h1>
-        <p className="text-[10px] text-white/30 tracking-[0.5em] mt-2 uppercase italic text-center text-emerald-400">NEURAL CORE ACTIVE</p>
+        <p className="text-[10px] text-white/30 tracking-[0.5em] mt-2 uppercase italic text-center">Sovereign Edition • Bismillah</p>
       </header>
       <div className={`grid gap-4 md:gap-6 w-full max-w-7xl ${isTV ? 'grid-cols-6' : 'grid-cols-3'}`}>
         {modules.map((m, i) => (
