@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
   swcMinify: false,
-  experimental: { webpackBuildWorker: true },
-  output: 'export',
+  output: 'export',  // ✅ Static export mode
   images: { unoptimized: true },
+  trailingSlash: true,
 }
