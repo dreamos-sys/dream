@@ -1,99 +1,93 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { store } from '@/lib/data/global-store';
+import { useState, useEffect } from 'react';
 
-export default function DashboardPage() {
+export default function DashboardTV() {
   const router = useRouter();
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [slideData, setSlideData] = useState<any[]>([]);
+  const [focusedIndex, setFocusedIndex] = useState(0);
 
-  // 7 Integrated Slides Config
-  const slides = [
-    { 
-      id: 1, title: '👋 Ucapan Salam', icon: '🌅',
-      getData: () => store.getGreeting(),
-      render: (d:any) => ({ title: d.text, subtitle: d.subtext, icon: d.icon })
-    },
-    { 
-      id: 2, title: '📅 Booking Realtime', icon: '📅',
-      getData: () => {
-        const today = new Date().toISOString().split('T')[0];
-        const tomorrow = new Date(Date.now()+86400000).toISOString().split('T')[0];
-        const bookings = store.get('bookings')||[];
-        return {
-          today: bookings.filter((b:any)=>b.date===today).length,
-          tomorrow: bookings.filter((b:any)=>b.date===tomorrow).length
-        };
-      },
-      render: (d:any) => ({ title:'Booking Hari Ini', subtitle:\`\${d.today} Today · \${d.tomorrow} Besok\`, icon:'📅' })
-    },
-    { 
-      id: 3, title: '⚠️ K3 & Safety', icon: '⚠️',
-      getData: () => store.getK3Progress(),
-      render: (d:any) => ({ title:'K3 Reports', subtitle:\`\${d.pending} Pending · \${d.inProgress} Action\`, icon:'⚠️' })
-    },
-    { 
-      id: 4, title: '🌤️ Weather', icon: '🌤️',
-      getData: () => store.getWeatherMitigations(),
-      render: (d:any) => ({ title:d.warning||'Weather', subtitle:\`\${d.temperature}°C \${d.condition}\`, icon:'☀️', alert:d.mitigations })
-    },
-    { id:5, title:'👔 Command Center', icon:'👔', getData:()=>({title:'Management Info',items:['📌 CEO Meeting - Room A (14:00)']}), render:(d:any)=>({title:d.title,subtitle:\`\${d.items.length} Events\`,icon:'👔',list:d.items}) },
-    { id:6, title:'🏢 Info Umum', icon:'🏢', getData:()=>({title:'General Info',items:['📌 Rapat Mingguan - 08:00']}), render:(d:any)=>({title:d.title,subtitle:\`\${d.items.length} Tasks\`,icon:'🏢',list:d.items}) },
-    { id:7, title:'💬 Kabar', icon:'💬', getData:()=>({title:'Announcements',items:['🎂 Birthday: Pak Hanung']}), render:(d:any)=>({title:d.title,subtitle:\`\${d.items.length} News\`,icon:'💬',list:d.items}) },
+  const modules = [
+    { id: 1, name: '🎛️ Command', path: '/modules/command', color: 'from-emerald-500 to-teal-600', icon: '🎛️' },
+    { id: 2, name: '🛡️ Security', path: '/modules/security', color: 'from-red-500 to-rose-600', icon: '🛡️' },
+    { id: 3, name: '📅 Booking', path: '/modules/booking', color: 'from-blue-500 to-indigo-600', icon: '📅' },
+    { id: 4, name: '⚠️ K3', path: '/modules/k3', color: 'from-amber-500 to-orange-600', icon: '⚠️' },
+    { id: 5, name: '🧹 Janitor', path: '/modules/janitor', color: 'from-lime-500 to-green-600', icon: '🧹' },
+    { id: 6, name: '📦 Stock', path: '/modules/stock', color: 'from-purple-500 to-violet-600', icon: '📦' },
+    { id: 7, name: '🔧 Service', path: '/modules/service', color: 'from-cyan-500 to-sky-600', icon: '🔧' },
+    { id: 8, name: '🏢 Asset', path: '/modules/asset', color: 'from-pink-500 to-fuchsia-600', icon: '🏢' },
+    { id: 9, name: '📺 Media', path: '/modules/media', color: 'from-yellow-500 to-amber-600', icon: '📺' },
+    { id: 10, name: '🌐 IoT', path: '/modules/iot', color: 'from-emerald-400 to-cyan-500', icon: '🌐' },
+    { id: 11, name: '📊 Analytics', path: '/modules/analytics', color: 'from-indigo-400 to-purple-500', icon: '📊' },
+    { id: 12, name: '⚙️ Settings', path: '/settings', color: 'from-gray-500 to-slate-600', icon: '⚙️' },
   ];
-  useEffect(() => {
-    const update = () => setSlideData(slides.map(s => ({...s, rendered: s.render(s.getData())})));
-    update();
-    const t = setInterval(update, 10000);
-    return () => clearInterval(t);
-  }, []);
 
   useEffect(() => {
-    const rot = setInterval(() => setCurrentSlide(p => (p+1)%slides.length), 8000);
-    return () => clearInterval(rot);
-  }, []);
+    const handleKey = (e: KeyboardEvent) => {
+      const cols = 4;
+      if (e.key === 'ArrowRight') setFocusedIndex(i => Math.min(i + 1, modules.length - 1));
+      if (e.key === 'ArrowLeft') setFocusedIndex(i => Math.max(i - 1, 0));
+      if (e.key === 'ArrowDown') setFocusedIndex(i => Math.min(i + cols, modules.length - 1));
+      if (e.key === 'ArrowUp') setFocusedIndex(i => Math.max(i - cols, 0));
+      if (e.key === 'Enter') router.push(modules[focusedIndex].path);
+      if (e.key === 'Backspace') router.back();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [focusedIndex, router, modules.length]);
 
-  const current = slideData[currentSlide]?.rendered || {title:'Loading...', subtitle:'', icon:'⏳'};
-
+  useEffect(() => {
+    const el = document.getElementById(`module-${focusedIndex}`);
+    el?.focus();
+  }, [focusedIndex]);
   return (
-    <div style={{minHeight:'100vh', background:'#F2F2F7', paddingBottom:'120px'}}>
-      <header style={{background:'white', padding:'30px 20px', borderBottomLeftRadius:'30px', borderBottomRightRadius:'30px'}}>
-        <div style={{textAlign:'center'}}>
-          <img src="/assets/img/icon-192.png" alt="Dream OS" style={{width:'80px',height:'80px',borderRadius:'22px',marginBottom:'15px'}}/>
-          <div style={{fontFamily:'Amiri,serif', fontSize:'24px', color:'#10b981'}}>بِسْمِ اللَّهِ</div>
-          <h1 style={{fontSize:'22px', fontWeight:'700', color:'#1c1c1e'}}>DREAM OS v14.0 PRO</h1>
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-4 md:p-8">
+      <header className="text-center mb-8">
+        <div className="text-2xl md:text-3xl font-arabic text-emerald-400 mb-2">
+          بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
         </div>
+        <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+          🎛️ Dream OS TV Edition
+        </h1>
+        <p className="text-slate-400 text-sm md:text-base mt-2">
+          Navigate: Arrow Keys • Select: ENTER
+        </p>
       </header>
 
-      {/* 7-Slide Carousel */}
-      <div style={{background:'linear-gradient(135deg,#0f172a,#020617)', border:'1px solid rgba(16,185,129,0.3)', borderRadius:'28px', padding:'24px', margin:'24px 15px'}}>
-        <div style={{display:'flex',justifyContent:'space-between',marginBottom:'18px'}}>
-          <span style={{color:'#10b981',fontWeight:'700'}}>{current.icon} {slideData[currentSlide]?.title}</span>
-          <div>
-            <button onClick={()=>setCurrentSlide(p=>(p-1+slides.length)%slides.length)} style={{background:'rgba(16,185,129,0.2)',border:'none',color:'#10b981',padding:'8px 14px',borderRadius:'10px',cursor:'pointer'}}>◀</button>
-            <button onClick={()=>setCurrentSlide(p=>(p+1)%slides.length)} style={{background:'rgba(16,185,129,0.2)',border:'none',color:'#10b981',padding:'8px 14px',borderRadius:'10px',cursor:'pointer',marginLeft:'8px'}}>▶</button>
-          </div>
-        </div>
-        <div style={{minHeight:'220px', background:'rgba(2,6,23,0.95)', borderRadius:'22px', padding:'24px', textAlign:'center', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center'}}>
-          <div style={{fontSize:'64px',marginBottom:'16px'}}>{current.icon}</div>
-          <div style={{color:'#10b981',fontSize:'20px',fontWeight:'700'}}>{current.title}</div>
-          <div style={{color:'rgba(148,163,184,0.85)',fontSize:'14px'}}>{current.subtitle}</div>
-          {current.alert && <div style={{marginTop:'16px',background:'rgba(239,68,68,0.1)',border:'1px solid rgba(239,68,68,0.3)',borderRadius:'12px',padding:'12px',width:'100%',textAlign:'left'}}>
-            <div style={{color:'#ef4444',fontSize:'11px',fontWeight:'700'}}>⚠️ MITIGATION</div>
-            {current.alert.map((a:string,i:number)=><div key={i} style={{color:'#fca5a5',fontSize:'10px',margin:'4px 0'}}>{a}</div>)}
-          </div>}
-          {current.list && <div style={{marginTop:'16px',width:'100%'}}>{current.list.map((item:string,i:number)=><div key={i} style={{color:'rgba(148,163,184,0.85)',fontSize:'11px',padding:'8px',background:'rgba(16,185,129,0.05)',borderRadius:'8px',margin:'4px 0'}}>{item}</div>)}</div>}
-        </div>
-        <div style={{display:'flex',justifyContent:'center',gap:'8px',marginTop:'16px'}}>
-          {slides.map((_,i)=><button key={i} onClick={()=>setCurrentSlide(i)} style={{width:'10px',height:'10px',borderRadius:'50%',border:'2px solid rgba(16,185,129,0.4)',background:i===currentSlide?'#10b981':'transparent',cursor:'pointer'}}/>) }
-        </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 max-w-7xl mx-auto">
+        {modules.map((mod, idx) => (
+          <button
+            key={mod.id}
+            id={`module-${idx}`}
+            tabIndex={0}
+            onClick={() => router.push(mod.path)}
+            className={`
+              group relative overflow-hidden rounded-3xl p-6 md:p-8
+              bg-gradient-to-br ${mod.color}
+              border-2 border-white/20
+              transition-all duration-300 ease-out
+              hover:scale-105 hover:border-yellow-400
+              focus:scale-105 focus:border-yellow-400 focus:shadow-[0_0_40px_rgba(255,215,0,0.6)]
+              focus:outline-none focus:ring-4 focus:ring-yellow-400/50
+              min-h-[140px] md:min-h-[180px]
+              flex flex-col items-center justify-center gap-3 md:gap-4
+            `}
+          >
+            <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity" />
+            <span className="text-4xl md:text-6xl drop-shadow-lg transform group-hover:scale-110 transition-transform">
+              {mod.icon}
+            </span>
+            <span className="text-sm md:text-lg font-semibold text-white drop-shadow-md text-center">
+              {mod.name}
+            </span>
+            <div className="absolute top-3 right-3 w-3 h-3 rounded-full bg-yellow-400 opacity-0 group-focus:opacity-100 transition-opacity animate-pulse" />
+          </button>
+        ))}
       </div>
 
-      {/* Module Grid Placeholder */}      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'12px',padding:'16px'}}>
-        {['Command','Booking','K3','Security','Janitor','Maintenance','Stok','Asset','Setting'].map(m=><div key={m} style={{background:'white',borderRadius:'20px',padding:'16px',textAlign:'center',boxShadow:'0 2px 12px rgba(0,0,0,0.05)'}}><div style={{fontSize:'24px',marginBottom:'8px'}}>⚡</div><div style={{fontSize:'11px',color:'#64748b'}}>{m}</div></div>)}
-      </div>
-    </div>
-  );
+      <footer className="text-center mt-12 text-slate-500 text-xs md:text-sm">
+        <p>Dream OS v2.1 • Next.js • Termux Powered 📱</p>
+        <p className="mt-1 text-emerald-400/80">Bismillah • Bi Idznillah</p>
+      </footer>
+    </main>  );
 }
