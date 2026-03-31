@@ -1,10 +1,8 @@
-.// pages/api/ai/chat.js - Dream OS V21 PRO Hybrid Mode
+// pages/api/ai/chat.js - Dream OS V21 PRO Hybrid Mode
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   
   const { prompt, spiritual = true } = req.body;
-  
-  // Ambil Alamat Tunnel dari Vercel Environment Variables
   const host = process.env.OLLAMA_HOST;
   
   if (!host) return res.status(500).json({ error: 'Jalur Tunnel (OLLAMA_HOST) belum di-set!' });
@@ -16,7 +14,7 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'qwen2.5-coder:1.5b', // Model yang sudah Master pull di Termux
+        model: 'qwen2.5-coder:1.5b',
         messages: [{ role: 'user', content: spiritual ? `Bismillah bi idznillah. ${prompt}` : prompt }],
         stream: false
       })
@@ -28,5 +26,3 @@ export default async function handler(req, res) {
     res.status(500).json({ error: `Gagal konek ke HP Master: ${err.message}` });
   }
 }
-
-
