@@ -1,4 +1,4 @@
-// pages/api/ai/chat.js - Dream OS V21 PRO (Official Pinggy Bypass)
+// pages/api/ai/chat.js - Dream OS V21 PRO (Pure Ollama Mode)
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   
@@ -9,11 +9,11 @@ export default async function handler(req, res) {
   host = host.replace(/\/$/, '');
 
   try {
-    const apiRes = await fetch(`${host}/v1/chat/completions`, {
+    const apiRes = await fetch(`${host}/api/chat`, { // <-- Pindah ke /api/chat
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
-        'X-Pinggy-No-Screen': 'true', // <-- INI KUNCI ASLINYA (Sesuai Gambar 114)
+        'X-Pinggy-No-Screen': 'true',
         'User-Agent': 'DreamOS-V21-Pro/1.0' 
       },
       body: JSON.stringify({
@@ -24,7 +24,9 @@ export default async function handler(req, res) {
     });
 
     const data = await apiRes.json();
-    res.status(200).json({ response: data.choices?.[0]?.message?.content, model: data.model });
+    // Penyesuaian parsing data untuk format asli Ollama
+    const reply = data.message?.content || "Sistem SINKRON, tapi Qwen masih malu-malu.";
+    res.status(200).json({ response: reply, model: data.model });
   } catch (err) {
     res.status(500).json({ error: `Gagal konek ke HP Master: ${err.message}` });
   }
