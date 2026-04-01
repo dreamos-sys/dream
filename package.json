@@ -2,6 +2,9 @@
   "name": "dream-os",
   "version": "2.1.0",
   "private": true,
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -25,11 +28,6 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "autoprefixer": "^10.4.27",
-    "postcss": "^8.5.8",
-    "tailwindcss": "^4.2.2",
-    "typescript": "^5.3.0"
+    "@types/react": "^18.2.0"
   }
 }
