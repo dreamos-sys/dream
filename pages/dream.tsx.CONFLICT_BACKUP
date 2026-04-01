@@ -1,0 +1,19 @@
+import Head from 'next/head';
+
+export default function DreamPage() {
+  return (
+    <>
+      <Head>
+        <title>Dream OS V21</title>
+      </Head>
+      <main className="min-h-screen p-4 bg-dream-900 text-neutral-100 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-dream-400 mb-2">🏠 Dream OS V21</h1>
+          <p className="text-neutral-300 mb-4">✅ Pages Router /dream is WORKING!</p>
+          <a href="/" className="text-dream-500 underline">← Back to Home</a>
+        </div>
+      </main>
+    </>
+  );
+}
+
