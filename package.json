@@ -12,6 +12,7 @@
   "dependencies": {
     "@mediapipe/tasks-vision": "^0.10.21",
     "@supabase/supabase-js": "^2.100.1",
+    "@tailwindcss/postcss": "^4.2.2",
     "@tanstack/react-virtual": "^3.13.23",
     "date-fns": "^4.1.0",
     "dompurify": "^3.3.3",
