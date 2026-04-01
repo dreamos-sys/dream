@@ -5,3 +5,29 @@ body {
   padding: 0;
   box-sizing: border-box;
 }
+
+/* Glassmorphism & Magnetic Effects */
+.glass-card {
+  @apply backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl;
+}
+
+:focus-visible {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}
+
+@keyframes magnetic {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.ghost-icon:hover {
+  animation: magnetic 0.3s ease;
+}
+
+/* Untuk remote TV */
+button, a, [role="button"] {
+  min-width: 48px;
+  min-height: 48px;
+}
