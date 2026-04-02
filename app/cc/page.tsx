@@ -1,5 +1,1 @@
-import { redirect } from 'next/navigation';
-
-export default function CommandCenterRedirect() {
-  redirect('/dream');
-}
+import { redirect } from 'next/navigation'; export default function R(){redirect('/dream')}
