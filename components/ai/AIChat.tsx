@@ -24,8 +24,8 @@ export const AIChat = () => {
       });
       const data = await res.json();
       setMessages(prev => prev.slice(0, -1).concat({ role: 'assistant', content: data.reply || 'Maaf, tidak ada respons.' }));
-    } catch (err) {
-      setMessages(prev => prev.slice(0, -1).concat({ role: 'assistant', content: '⚠️ Error: ' + err.message }));
+    } catch (err: unknown) {
+      setMessages(prev => prev.slice(0, -1).concat({ role: 'assistant', content: '⚠️ Error: ' + (err as Error)?.message || 'Unknown error' }));
     } finally {
       setLoading(false);
     }
